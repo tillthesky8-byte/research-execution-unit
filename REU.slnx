@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="src/REU.App/REU.App.csproj" />
+  <Project Path="src/REU.Contracts/REU.Contracts.csproj" />
+  <Project Path="src/REU.Pipeline/REU.Pipeline.csproj" />
+  <Project Path="src/REU.Simulator/REU.Simulator.csproj" />
+  <Project Path="tests/REU.Tests/REU.Tests.csproj" />
+</Solution>

@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+ 
+/data/
+/output/
+ 
+*.user
+.vs/
+.idea/
+*.suo
+ 
+.DS_Store
+Thumbs.db
