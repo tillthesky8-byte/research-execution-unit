@@ -40,6 +40,8 @@ The system is split into clear layers:
 
 6. Namespaces shouldn't have REU.* in them.  
 
+7. Dictionary's method TryGetValue should be wrapped in helper methods that return nullable value, with explicit and domain-specific names. For example, instead of `dictionary.TryGetValue(key, out value)`, we should have a method like `TryGetStrategy(string strategyName)` that returns `Strategy?`. This improves readability and encapsulates the dictionary access logic.
+
 ---
 
 ## What NOT to generate
