@@ -3,11 +3,14 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using System.CommandLine;
+using App.Commands;
 using App.Logging;
+
 
 internal class Program
 {
-    private static void Main(string[] args)
+    private static async Task<int> Main(string[] args)
     {
         var builder = Host.CreateApplicationBuilder(args);
 
@@ -21,12 +24,11 @@ internal class Program
         
         var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
-        logger.LogInformation("This is INFORMATION.");
-        logger.LogWarning("This is WARNING.");
-        logger.LogError("This is ERROR.");
-        logger.LogDebug("This is DEBUG.");
-        logger.LogTrace("This is TRACE.");
+        var rootCommand = new RootCommand("REU Data Processing Application")
+        {
+            new RunPipelineCommand()
+        };
 
-        return;
+        return await rootCommand.Parse(args).InvokeAsync();
     }
 }
