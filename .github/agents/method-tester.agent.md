@@ -50,7 +50,7 @@ Safety & permissions
 
 Prompts & usage examples
 - "Test the method at `src/REU.Modules/Strategies/MovingAverageStrategy.cs` line 40."  
-- "Create a unit test for `FeatureAligner.Transform` that demonstrates timestamp alignment."  
+- "Create a unit test for `Fuser.Fuse` that demonstrates timestamp alignment."  
 - "Run tests for `REU.Tests.Modules.Strategies.MovingAverageStrategyTests` and show failures."  
 
 Clarifying options (agent should ask if unspecified)

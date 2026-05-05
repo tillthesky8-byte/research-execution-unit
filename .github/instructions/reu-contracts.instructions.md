@@ -5,7 +5,7 @@ applyTo: "src/REU.Contracts/**/*.cs"
 
 # REU.Contracts Guidelines
 
-REU.Contracts is the foundational layer containing all core models and interfaces. It has **zero dependencies** on other layers.
+REU.Contracts is the foundational layer containing all core models and interfaces. It has **zero dependencies** on other layers, and no definition of ValueObjects (Don't suggest ValueObjects, don't mention them, those aren't part of not only contracts but also the whole project).
 
 ## Core Principles
 
@@ -24,7 +24,6 @@ REU.Contracts is the foundational layer containing all core models and interface
    - Default to non-nullable unless reason to allow null
 
 4. **Record types for immutable data**
-   - Use `record` for value objects (e.g., `MarketContext`, `StrategySignal`)
    - Use `class` only for stateful domain objects with identity
 
 5. **Explicit constructors**
@@ -36,7 +35,7 @@ REU.Contracts is the foundational layer containing all core models and interface
 REU.Contracts/
 ├── Models/
 │   ├── MarketContext.cs
-│   ├── StrategySignal.cs
+│   ├── OrderRequest.cs
 │   └── ...
 ├── Interfaces/
 │   ├── IStrategy.cs

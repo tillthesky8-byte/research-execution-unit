@@ -25,18 +25,10 @@ A single time-step of market data, including:
 ---
 
 ### Strategy
-Generates signals based on market state.
+Generates orders based on market state.
 
 Output:
-StrategySignal[]
-
----
-
-### Allocator
-Transforms signals into executable orders.
-
-Output:
-OrderCommand[]
+OrderRequest[]
 
 ---
 

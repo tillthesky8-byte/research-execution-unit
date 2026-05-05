@@ -50,15 +50,13 @@ tests/
 │   ├── Contracts/
 │   │   └── MarketContextTests.cs
 │   ├── Modules/
-│   │   ├── Strategies/
-│   │   │   └── MovingAverageStrategyTests.cs
-│   │   └── Allocators/
-│   │       └── EqualWeightAllocatorTests.cs
+│   │   └── Strategies/
+│   │       └── MovingAverageStrategyTests.cs
 │   ├── Pipeline/
 │   │   ├── Loaders/
 │   │   │   └── CSVDataLoaderTests.cs
-│   │   └── Transformers/
-│   │       └── FeatureAlignerTests.cs
+│   │   └── Fusers/
+│   │       └── FuserTests.cs
 │   ├── Simulator/
 │   │   ├── SimulationEngineTests.cs
 │   │   └── Broker/

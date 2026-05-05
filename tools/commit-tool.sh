@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
-# Simple commit-agent: generates a commit message from git changes and commits
-# Usage: tools/commit-agent.sh [-a] [-n|--dry-run]
+#!/usr/bin/env zsh
+
+# Usage: tools/commit-tool.sh [-a] [-n|--dry-run]
 #   -a : stage all changes before committing
 #   -n|--dry-run : show the generated commit message without committing
 
@@ -117,7 +117,7 @@ for item in "${changed_files[@]}"; do
   body+="- $item\n"
 done
 
-body+="\nGenerated-by: commit-agent (tools/commit-agent.sh)\n"
+body+="\nGenerated-by: commit-tool (tools/commit-tool.sh)\n"
 
 echo "---\nSubject:\n$subject\n---\n"
 echo -e "$body"

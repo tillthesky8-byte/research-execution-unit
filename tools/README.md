@@ -1,4 +1,4 @@
-# Commit Agent (tools/commit-agent.sh)
+git# Commit Tool (tools/commit-tool.sh)
 
 Simple helper to generate a conventional-style commit message from the current git changes and commit them.
 
@@ -7,13 +7,13 @@ Usage examples:
 Stage all and commit:
 
 ```bash
-tools/commit-agent.sh -a
+tools/commit-tool.sh -a
 ```
 
 Preview commit message without committing:
 
 ```bash
-tools/commit-agent.sh --dry-run
+tools/commit-tool.sh --dry-run
 ```
 
 Notes:

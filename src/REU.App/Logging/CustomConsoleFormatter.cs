@@ -41,7 +41,7 @@ public sealed class CustomConsoleFormatter : ConsoleFormatter
         textWriter.Write($"{ConsoleColors.CategoryBackgroundColor}{levelColor}{levelString}{ConsoleColors.Reset} ");
 
         textWriter.Write($"{ConsoleColors.CategoryBackgroundColor}{ConsoleColors.CategoryForegroundColor}{category, -40}{ConsoleColors.Reset}| ");
-        textWriter.Write($"{ConsoleColors.ValueColor}{message}{ConsoleColors.Reset}");
+        textWriter.Write($"{message}");
 
         if (logEntry.Exception is not null)
             textWriter.Write($" | Exception: {logEntry.Exception}");

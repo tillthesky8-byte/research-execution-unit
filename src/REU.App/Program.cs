@@ -1,9 +1,10 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
-using App.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using App.Logging;
+
 internal class Program
 {
     private static void Main(string[] args)
@@ -15,10 +16,9 @@ internal class Program
 
         builder.Logging.AddConsoleFormatter<CustomConsoleFormatter, ConsoleFormatterOptions>();
         builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
-        
-        Console.WriteLine(builder.Configuration["Logging:LogLevel:Default"]);
 
         using var app = builder.Build();
+        
         var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
         logger.LogInformation("This is INFORMATION.");

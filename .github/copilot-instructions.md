@@ -10,7 +10,7 @@ The goal is to simulate market behavior, generate signals, allocate capital, and
 
 The system is split into clear layers:
 
-- REU.Contracts → core models, enums, value objects (no logic tied to IO)
+- REU.Contracts → core models, enums, etc. with no dependencies
 - REU.Modules → pluggable behavior (strategies, indicators, models)
 - REU.Pipeline → data flow (loading, alignment, output generation)
 - REU.Simulator → simulation runtime (execution loop, broker, portfolio)
@@ -26,7 +26,7 @@ The system is split into clear layers:
    - Pipeline prepares data; Simulator consumes it
 
 2. Data flow is one-directional
-   MarketContext → Features → Strategy → Signals → Allocator → Orders → Broker
+   MarketContext → Features → Strategy → OrderRequest → Orders → Broker
 
 3. No hidden side effects
    - Methods should be deterministic where possible
