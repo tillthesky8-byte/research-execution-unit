@@ -1,7 +1,7 @@
 using Contracts.Rows;
 namespace Contracts.Interfaces;
 
-public interface IFueser
+public interface IFuser
 {
     IReadOnlyList<MarketContext> Fuse
     (

@@ -8,7 +8,7 @@ namespace Pipeline.Runners;
 public class Pipeline : IPipeline
 {
     private readonly ILoader _loader;
-    private readonly IFueser _fuser;
+    private readonly IFuser _fuser;
     private readonly InstrumentDefinition[] _instruments;
     private readonly FactorDefinition[] _factors;
     private readonly Timeframe _ohlcvTimeframe;
@@ -16,7 +16,7 @@ public class Pipeline : IPipeline
     private readonly DateTime _startDate;
     private readonly DateTime _endDate;
 
-    public Pipeline(ILoader loader, IFueser fuser, DatasetDefinition datasetDefinition)
+    public Pipeline(ILoader loader, IFuser fuser, DatasetDefinition datasetDefinition)
     {
         _loader = loader;
         _fuser = fuser;

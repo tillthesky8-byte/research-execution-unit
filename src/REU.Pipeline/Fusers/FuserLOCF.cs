@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Pipeline.Fusers;
 
-public class FuserLOCF : IFueser
+public class FuserLOCF : IFuser
 {
     private readonly ILogger<FuserLOCF> _logger;
     public FuserLOCF(ILogger<FuserLOCF> logger)

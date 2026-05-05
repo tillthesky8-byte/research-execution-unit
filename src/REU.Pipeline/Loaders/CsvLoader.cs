@@ -14,7 +14,7 @@ public class CsvLoader : ILoader
     private readonly string _dataDirectory;
     private const string OhlcvFilePattern = "{0}_{1}_{2}_{3}.csv"; // e.g. AAPL_1m_20260101_20260131.csv
     private const string FactorFilePattern = "{0}_{1}_{2}_{3}.csv"; // e.g. interest_rate_1d_20260101_20261231.csv
-    public CsvLoader(ILogger<CsvLoader> logger, string dataDirectory)
+    public CsvLoader(string dataDirectory, ILogger<CsvLoader> logger)
     {
         _logger = logger;
         _dataDirectory = dataDirectory;

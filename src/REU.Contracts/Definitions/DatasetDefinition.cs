@@ -4,6 +4,7 @@ namespace Contracts.Definitions
 {
     public class DatasetDefinition
     {
+        public required string ConnectionString { get; init; }
         public required InstrumentDefinition[] Instruments { get; init; }
         public required FactorDefinition[] Factors { get; init; }
         public required OutputDefinition Output { get; init; }
