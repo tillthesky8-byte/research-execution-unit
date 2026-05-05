@@ -4,5 +4,6 @@ public enum OutputFormat
 {
     Csv,
     Parquet,
-    Exel
+    Json,
+    Sqlite
 }

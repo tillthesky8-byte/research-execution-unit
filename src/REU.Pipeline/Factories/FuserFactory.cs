@@ -7,12 +7,12 @@ namespace Pipeline.Factories;
 
 public static class FuserFactory
 {
-    public static IFuser CreateFuser(FuserType strategy, ILoggerFactory loggerFactory)
+    public static IFuser CreateFuser(FuserType type, ILoggerFactory loggerFactory)
     {
-        return strategy switch
+        return type switch
         {
             FuserType.LastObservationCarriedForward => new FuserLOCF(loggerFactory.CreateLogger<FuserLOCF>()),
-            _ => throw new NotImplementedException($"Fuser type {strategy} is not implemented.")
+            _ => throw new NotImplementedException($"Fuser type {type} is not implemented.")
         };
     }
 }

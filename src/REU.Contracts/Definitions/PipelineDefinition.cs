@@ -5,6 +5,8 @@ namespace Contracts.Definitions;
 public record PipelineDefinition
 {
     public required DatasetDefinition Dataset { get; init; }
+    public required OutputDefinition Output { get; init; }
     public LoaderType LoaderType { get; init; } = LoaderType.Sqlite;
     public FuserType FuserType { get; init; } = FuserType.LastObservationCarriedForward;
+    public WriterType WriterType { get; init; } = WriterType.CsvFile;
 }

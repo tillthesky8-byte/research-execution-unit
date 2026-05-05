@@ -9,6 +9,7 @@ public class Pipeline : IPipeline
 {
     private readonly ILoader _loader;
     private readonly IFuser _fuser;
+    private readonly IWriter _writer;
     private readonly InstrumentDefinition[] _instruments;
     private readonly FactorDefinition[] _factors;
     private readonly Timeframe _ohlcvTimeframe;
@@ -16,10 +17,11 @@ public class Pipeline : IPipeline
     private readonly DateTime _startDate;
     private readonly DateTime _endDate;
 
-    public Pipeline(ILoader loader, IFuser fuser, DatasetDefinition datasetDefinition)
+    public Pipeline(ILoader loader, IFuser fuser, IWriter writer, DatasetDefinition datasetDefinition)
     {
         _loader = loader;
         _fuser = fuser;
+        _writer = writer;
         _instruments = datasetDefinition.Instruments;
         _factors = datasetDefinition.Factors;
         _ohlcvTimeframe = datasetDefinition.Timeframe;
@@ -46,5 +48,11 @@ public class Pipeline : IPipeline
 
         var marketContext = _fuser.Fuse(ohlcvDataBySymbol, factorDataBySymbol);
         return marketContext;
+    }
+
+    public async Task WriteFrameAsync(IReadOnlyList<MarketContext> marketContexts)
+    {
+        if (marketContexts == null || marketContexts.Count == 0) return;
+        await _writer.WriteFrameAsync(marketContexts);
     }
 }

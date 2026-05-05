@@ -24,8 +24,9 @@ public class PipelineBuilder
 
         var loader = LoaderFactory.CreateLoader(_pipelineDefinition.LoaderType, _pipelineDefinition.Dataset.ConnectionString, _loggerFactory);
         var fuser = FuserFactory.CreateFuser(_pipelineDefinition.FuserType, _loggerFactory);
+        var writer = WriterFactory.CreateWriter(_pipelineDefinition.WriterType, _pipelineDefinition.Output.Path, _loggerFactory);
 
-        return new Pipeline(loader, fuser, _pipelineDefinition.Dataset);
+        return new Pipeline(loader, fuser, writer, _pipelineDefinition.Dataset);
     }
 }
 

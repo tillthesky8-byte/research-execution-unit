@@ -1,5 +1,5 @@
 
-# REU — Research & Execution Unit
+# REU — Research Execution Unit
 
 REU is a modular trading simulation and research framework designed for building, testing, and evaluating strategies on historical data.
 
