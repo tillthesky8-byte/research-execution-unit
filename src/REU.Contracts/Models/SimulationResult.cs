@@ -8,12 +8,12 @@ public record SimulationResult(
     decimal AnnualizedReturn,
     decimal MaxDrawdown,
     decimal SharpeRatio,
-    decimal SortinoRatio
+    decimal SortinoRatio,
+    DateTime StartDate,
+    DateTime EndDate
 
 )
 {
-    public DateTime StartDate => EquityCurve.FirstOrDefault()?.Timestamp ?? DateTime.MinValue;
-    public DateTime EndDate => EquityCurve.LastOrDefault()?.Timestamp ?? DateTime.MinValue; 
     public decimal TotalCommission => Trades.Sum(t => t.CommissionPaid);
     public override string ToString() => $"""
         Backtest Summary:
