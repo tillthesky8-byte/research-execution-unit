@@ -7,12 +7,12 @@ namespace Pipeline.Factories;
 
 public static class LoaderFactory
 {
-    public static ILoader CreateLoader(LoaderType loaderType, string connectionString, ILoggerFactory loggerFactory)
+    public static ILoader CreateLoader(LoaderType loaderType, string source, ILoggerFactory loggerFactory)
     {
         return loaderType switch
         {
-            LoaderType.Sqlite => new SqliteLoader(connectionString, loggerFactory.CreateLogger<SqliteLoader>()),
-            LoaderType.Csv => new CsvLoader(connectionString, loggerFactory.CreateLogger<CsvLoader>()),
+            LoaderType.Sqlite => new SqliteLoader(source, loggerFactory.CreateLogger<SqliteLoader>()),
+            LoaderType.Csv => new CsvLoader(source, loggerFactory.CreateLogger<CsvLoader>()),
             _ => throw new NotImplementedException($"Loader type {loaderType} is not implemented.")
         };
     }

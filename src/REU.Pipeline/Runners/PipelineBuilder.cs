@@ -22,9 +22,9 @@ public class PipelineBuilder
     public IPipeline BuildPipeline()
     {
 
-        var loader = LoaderFactory.CreateLoader(_pipelineDefinition.LoaderType, _pipelineDefinition.Dataset.ConnectionString, _loggerFactory);
+        var loader = LoaderFactory.CreateLoader(_pipelineDefinition.LoaderType, _pipelineDefinition.Source, _loggerFactory);
         var fuser = FuserFactory.CreateFuser(_pipelineDefinition.FuserType, _loggerFactory);
-        var writer = WriterFactory.CreateWriter(_pipelineDefinition.WriterType, _pipelineDefinition.Output.Path, _loggerFactory);
+        var writer = WriterFactory.CreateWriter(_pipelineDefinition.WriterType, _pipelineDefinition.OutputPath, _loggerFactory);
 
         return new Pipeline(loader, fuser, writer, _pipelineDefinition.Dataset);
     }
