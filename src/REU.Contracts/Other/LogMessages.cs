@@ -23,4 +23,8 @@ public static class LogMessages
     {
         return $"{ConsoleColors.Cyan}{orderId}{ConsoleColors.Reset} {side} {type} Order SUBMITTED for {ConsoleColors.ValueColor}{symbol}{ConsoleColors.Reset} QTY: {ConsoleColors.ValueColor}{quantity}{ConsoleColors.Reset}";
     }
+
+    public static string OnNewTickPortfolioOverview(decimal equity, decimal cash) =>
+        $"New Tick - Portfolio Overview: {ConsoleColors.ValueColor}Equity: {equity}{ConsoleColors.Reset}, {ConsoleColors.ValueColor}Cash: {cash}{ConsoleColors.Reset}";
+        
 }

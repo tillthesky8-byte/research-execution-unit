@@ -33,7 +33,7 @@ public sealed class Portfolio(decimal initialCash) : IReadOnlyPortfolio
             return ScaleInPosition(symbol, quantityDelta, price);
             
         else
-            return PartialClosePosition(symbol, quantityDelta, price);
+            return PartialClosePosition(symbol, quantityDelta);
     }
 
     private bool IsReversal(decimal oldQuantity, decimal newQuantity) =>
@@ -51,27 +51,29 @@ public sealed class Portfolio(decimal initialCash) : IReadOnlyPortfolio
     private TradeAction ReversePosition(string symbol, decimal quantityDelta, decimal price)
     {
         var existingPosition = _positions[symbol];
-        _positions[symbol] = new Position
-        {
-            Symbol = symbol,
-            Quantity = existingPosition.Quantity + quantityDelta,
-            AverageEntryPrice = price
-        };
+        existingPosition.Quantity += quantityDelta;
+        existingPosition.AverageEntryPrice = price;
         return TradeAction.Reverse;    
     }
     
     private TradeAction ScaleInPosition(string symbol, decimal quantityDelta, decimal price)
     {
         var existingPosition = _positions[symbol];
+        existingPosition.AverageEntryPrice = (existingPosition.AverageEntryPrice * Math.Abs(existingPosition.Quantity) + price * Math.Abs(quantityDelta)) / Math.Abs(existingPosition.Quantity + quantityDelta);
         existingPosition.Quantity += quantityDelta;
-        existingPosition.AverageEntryPrice = ((existingPosition.AverageEntryPrice * (existingPosition.Quantity - quantityDelta)) + (quantityDelta * price)) / existingPosition.Quantity;
         return TradeAction.ScaleIn;    
     }
 
-    private TradeAction PartialClosePosition(string symbol, decimal quantityDelta, decimal price)
+    private TradeAction PartialClosePosition(string symbol, decimal quantityDelta)
     {
         var existingPosition = _positions[symbol];
         existingPosition.Quantity += quantityDelta;
+        
+        if (existingPosition.Quantity == 0)
+        {
+            _positions.Remove(symbol);
+            return TradeAction.Close;
+        }             
         return TradeAction.PartialClose;    
     }
 }

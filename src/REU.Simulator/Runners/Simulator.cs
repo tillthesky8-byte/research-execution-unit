@@ -1,6 +1,7 @@
 using Contracts.Interfaces;
 using Contracts.Models;
 using Contracts.Rows;
+using Contracts;
 using Microsoft.Extensions.Logging;
 
 namespace Simulator.Runners;
@@ -26,13 +27,15 @@ public class Simulator : ISimulator
     {
         foreach (var context in marketData)
         {
+            _logger.LogInformation(LogMessages.OnNewTickPortfolioOverview(_portfolio.GetEquity(context), _portfolio.Cash));
+            
             _broker.ProcessOrders(context, _portfolio);
 
             var orders = _strategy.OnTick(context, _portfolio);
 
-            foreach (var order in orders)            {
+            foreach (var order in orders)            
                 _broker.SubmitOrder(order, context, _portfolio);
-            }
+            
 
             _recorder.Record(context.Timestamp, _portfolio.GetEquity(context));
         }

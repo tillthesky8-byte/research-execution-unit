@@ -67,6 +67,7 @@ public class Recorder : IRecorder
         if (_equityCurve.Count < 2)
             return 0;
 
+        // Assumes one equity point per trading day. For intraday data, adjust periodsPerYear accordingly.
         var returns = _equityCurve
             .Zip(_equityCurve.Skip(1), (prev, next) => (next.Equity / prev.Equity) - 1)
             .ToArray();
@@ -83,12 +84,18 @@ public class Recorder : IRecorder
         if (_equityCurve.Count < 2)
             return 0;
 
+        // Assumes one equity point per trading day. For intraday data, adjust periodsPerYear accordingly.
         var returns = _equityCurve
             .Zip(_equityCurve.Skip(1), (prev, next) => (next.Equity / prev.Equity) - 1)
             .ToArray();
 
         decimal mean = returns.Average();
-        decimal downsideStdDev = (decimal)Math.Sqrt(returns.Where(r => r < riskFreeRate / periodsPerYear).Average(r => Math.Pow((double)(r - riskFreeRate / periodsPerYear), 2)));
+        
+        var downsideReturns = returns.Where(r => r < riskFreeRate / periodsPerYear).ToArray();
+        if (downsideReturns.Length == 0)
+            return 0; // No downside returns, undefined ratio
+        
+        decimal downsideStdDev = (decimal)Math.Sqrt(downsideReturns.Average(r => Math.Pow((double)(r - riskFreeRate / periodsPerYear), 2)));
         if (downsideStdDev == 0) return 0;
 
         return (mean - riskFreeRate / periodsPerYear) / downsideStdDev * (decimal)Math.Sqrt(periodsPerYear);

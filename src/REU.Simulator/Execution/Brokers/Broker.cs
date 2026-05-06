@@ -48,8 +48,10 @@ public class Broker : IBroker
             };
 
             if (triggered)
+            {
                 FillOrder(pending, marketContext, portfolio);
                 toRemove.Add(pending);
+            }
             
         }
         _pendingOrders.RemoveAll(toRemove.Contains);
@@ -70,7 +72,7 @@ public class Broker : IBroker
         decimal fillPrice = _slippageModel.Apply(rawPrice, order.Request, marketContext);
         decimal comission = _comissionModel.CalculateCommission(fillPrice, order.Request.Quantity);
 
-        decimal totalCost = fillPrice * order.Request.Quantity + comission;
+        decimal totalCost = fillPrice * order.Request.Quantity + (order.Request.Side == OrderSide.Buy ? comission : -comission);
 
         if (order.Request.Side == OrderSide.Buy)
         {

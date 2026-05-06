@@ -8,6 +8,7 @@
 
 <ItemGroup>
     <ProjectReference Include="..\REU.Contracts\REU.Contracts.csproj" />
+    <ProjectReference Include="..\REU.Modules\REU.Modules.csproj" />
   </ItemGroup>
 
   <ItemGroup>
