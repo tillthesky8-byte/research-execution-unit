@@ -1,4 +1,4 @@
-namespace App.Logging;
+namespace Contracts;
 
 public static class ConsoleColors
 {

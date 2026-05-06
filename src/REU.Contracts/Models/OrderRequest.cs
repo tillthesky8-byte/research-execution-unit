@@ -6,6 +6,8 @@ public record OrderRequest
 (
     string Symbol,
     OrderSide Side,
+    OrderType Type,
     decimal Quantity,
-    decimal Price
+    decimal? LimitPrice = null,
+    decimal? StopPrice = null
 );

@@ -25,28 +25,25 @@ public class BBB : IStrategy
             if (!_bb.IsReady(symbol)) continue;
 
             var hasPosition = portfolio.Positions.TryGetValue(symbol, out var position);
+            var allocation = portfolio.Cash * 0.1m; 
+            var quantity = Math.Floor(allocation / bar.Close);
 
             if (!hasPosition || position!.Quantity == 0) 
             {
                 if (bar.Close > _bb.UpperBand(symbol))
-                {
-                    yield return new OrderRequest(symbol, OrderSide.Buy, 100, bar.Close);
-                }
+                    yield return new OrderRequest(symbol, OrderSide.Buy, OrderType.Market, quantity);
+
                 else if (bar.Close < _bb.LowerBand(symbol))
-                {
-                    yield return new OrderRequest(symbol, OrderSide.Sell, 100, bar.Close); 
-                }
+                    yield return new OrderRequest(symbol, OrderSide.Sell, OrderType.Market, quantity); 
+
             }
             else
             {
                 if (position.Quantity > 0 && bar.Close < _bb.MiddleBand(symbol))
-                {
-                    yield return new OrderRequest(symbol, OrderSide.Sell, position.Quantity, bar.Close); 
-                }
+                    yield return new OrderRequest(symbol, OrderSide.Sell, OrderType.Market, position.Quantity); 
+                
                 else if (position.Quantity < 0 && bar.Close > _bb.MiddleBand(symbol))
-                {
-                    yield return new OrderRequest(symbol, OrderSide.Buy, -position.Quantity, bar.Close);
-                }
+                    yield return new OrderRequest(symbol, OrderSide.Buy, OrderType.Market, position.Quantity);
             }
 
         }

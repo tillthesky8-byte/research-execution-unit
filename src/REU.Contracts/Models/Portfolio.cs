@@ -16,6 +16,7 @@ public sealed class Portfolio(decimal initialCash) : IReadOnlyPortfolio
         decimal positionValue = _positions.Values.Sum(p => p.GetMarketValue(marketContext));
         return positionValue + _cash;
     }
+    public void UpdateCash(decimal amount) => _cash += amount;  
 
     public TradeAction AdjustPosition(string symbol, decimal quantityDelta, decimal price)
     {

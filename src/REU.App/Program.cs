@@ -8,6 +8,7 @@ using App.Commands;
 using App.Logging;
 using Contracts.Configs;
 using Contracts.Enums;
+using Contracts;
 
 
 internal class Program
