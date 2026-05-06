@@ -7,34 +7,39 @@ public class BollingerBands
     private readonly int _period;
     private readonly decimal _stdDevMultiplier;
     private readonly string _source;
-    private readonly Queue<decimal?> _priceWindow = new();
-    private decimal _middleBand;
-    private decimal _upperBand;
-    private decimal _lowerBand;
-    public decimal MiddleBand => _middleBand;
-    public decimal UpperBand => _upperBand;
-    public decimal LowerBand => _lowerBand;
-    public bool IsReady => _priceWindow.Count == _period;
+    private readonly Dictionary<string, Queue<decimal?>> _priceWindows = new();
+    private Dictionary<string, decimal> _upperBands = new();
+    private Dictionary<string, decimal> _middleBands = new();
+    private Dictionary<string, decimal> _lowerBands = new();
 
-    public BollingerBands(int period = 20, decimal stdDevMultiplier = 2m, string source = "Close")
+    public decimal UpperBand(string symbol) => _upperBands.GetValueOrDefault(symbol);
+    public decimal MiddleBand(string symbol) => _middleBands.GetValueOrDefault(symbol);
+    public decimal LowerBand(string symbol) => _lowerBands.GetValueOrDefault(symbol);
+    public bool IsReady(string symbol) => _priceWindows.TryGetValue(symbol, out var window) && window.Count == _period;
+
+    public BollingerBands(int period, decimal stdDevMultiplier, string source)
     {
         _period = period;
         _stdDevMultiplier = stdDevMultiplier;
         _source = source;
     }
 
-    public void Update(OhlcvBar bar)
+    public void Update(OhlcvBar bar, string symbol)
     {
-        _priceWindow.Enqueue(bar[_source]);
-        if (_priceWindow.Count > _period)
-            _priceWindow.Dequeue();
+        if (!_priceWindows.ContainsKey(symbol))
+            _priceWindows[symbol] = new Queue<decimal?>();
 
-        if (_priceWindow.Count == _period)
+        var window = _priceWindows[symbol];
+        window.Enqueue(bar[_source]);
+        if (window.Count > _period)
+            window.Dequeue();
+
+        if (window.Count == _period)
         {
-            _middleBand = _priceWindow.Average() ?? 0;
-            decimal stdDev = StdDev(_priceWindow);
-            _upperBand = _middleBand + _stdDevMultiplier * stdDev;
-            _lowerBand = _middleBand - _stdDevMultiplier * stdDev;
+            _middleBands[symbol] = window.Average() ?? 0;
+            decimal stdDev = StdDev(window);
+            _upperBands[symbol] = _middleBands[symbol] + _stdDevMultiplier * stdDev;
+            _lowerBands[symbol] = _middleBands[symbol] - _stdDevMultiplier * stdDev;
         }
     }
 
