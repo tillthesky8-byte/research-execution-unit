@@ -1,4 +1,4 @@
-what---
+---
 name: "Method Tester Agent"
 description: "Agent that, when pointed at a method, generates or updates a unit test for it, runs the test(s), and reports results. Uses NUnit by default for this repository."
 applyTo: "src/**"

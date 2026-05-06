@@ -1,6 +1,7 @@
 ---
 name: "Commit Review Agent"
 description: "Agent that reviews the current worktree since the last commit and writes a concise conventional-style commit summary with bullet points."
+model: Claude Haiku 4.5 (copilot)
 applyTo: "**/*"
 ---
 
