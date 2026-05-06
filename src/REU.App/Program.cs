@@ -49,14 +49,21 @@ internal class Program
         using var app = builder.Build();
         
         var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
 
         var resolvedPipelineConfig = app.Services.GetRequiredService<RunPipelineConfig>();
-        logger.LogInformation("Application started with configuration: {@PipelineConfig}", resolvedPipelineConfig);
+        logger.LogInformation("Application started with configuration:");
+        logger.LogInformation("ConnectionString: {valueColor}{ConnectionString}{reset}", ConsoleColors.ValueColor, resolvedPipelineConfig.ConnectionString, ConsoleColors.Reset);
+        logger.LogInformation("FilePath:         {valueColor}{FilePath}{reset}", ConsoleColors.ValueColor, resolvedPipelineConfig.FilePath, ConsoleColors.Reset);
+        logger.LogInformation("OutputPath:       {valueColor}{OutputPath}{reset}", ConsoleColors.ValueColor, resolvedPipelineConfig.OutputPath, ConsoleColors.Reset);
+        logger.LogInformation("LoaderType:       {valueColor}{LoaderType}{reset}", ConsoleColors.ValueColor, resolvedPipelineConfig.LoaderType, ConsoleColors.Reset);
+        logger.LogInformation("FuserType:        {valueColor}{FuserType}{reset}", ConsoleColors.ValueColor, resolvedPipelineConfig.FuserType, ConsoleColors.Reset);
+        logger.LogInformation("WriterType:       {valueColor}{WriterType}{reset}", ConsoleColors.ValueColor, resolvedPipelineConfig.WriterType, ConsoleColors.Reset);
 
 
         var rootCommand = new RootCommand("REU Data Processing Application")
         {
-            new RunPipelineCommand(resolvedPipelineConfig)
+            new RunPipelineCommand(resolvedPipelineConfig, loggerFactory)
         };
 
         return await rootCommand.Parse(args).InvokeAsync();

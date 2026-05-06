@@ -1,15 +1,15 @@
 using System.CommandLine;
 using App.Options;
+using App.Runners;
 using Contracts.Configs;
 using Contracts.Definitions;
 using Contracts.Enums;
-using Microsoft.Data.Sqlite;
-using CsvHelper;
+using Microsoft.Extensions.Logging;
 namespace App.Commands;
 
 public class RunPipelineCommand : Command
 {
-    public RunPipelineCommand(RunPipelineConfig config) : base("pipeline", "Run the data processing pipeline with the specified configuration.")
+    public RunPipelineCommand(RunPipelineConfig config, ILoggerFactory loggerFactory) : base("pipeline", "Run the data processing pipeline with the specified configuration.")
     {
 
         var instrumentOption = new InstrumentOption();
@@ -42,6 +42,7 @@ public class RunPipelineCommand : Command
 
         SetAction(async (context) =>
         {
+            // note: introduce mapper 
             var instruments = context.GetValue(instrumentOption);
             var timeframe = context.GetValue(timeframeOption);
             var startDate = context.GetValue(startDateOption);
@@ -56,7 +57,7 @@ public class RunPipelineCommand : Command
             var fuser = context.GetValue(fuserOption) ?? config.FuserType;
             var writer = context.GetValue(writerOption) ?? config.WriterType;
 
-
+            // note: introduce separate validation layer
             if (instruments == null || instruments.Length == 0)
                 throw new ArgumentException("At least one instrument must be specified using --instrument or -i option.");
 
@@ -65,6 +66,9 @@ public class RunPipelineCommand : Command
 
             if (startDate > endDate)
                 throw new ArgumentException("Start date cannot be later than end date.");
+
+            var runId = BuildRunId("pipeline", instruments);
+            var outputDirectory = Path.Combine(outputPath, runId);
 
             var pipelineDefinition = new PipelineDefinition
             {
@@ -77,63 +81,22 @@ public class RunPipelineCommand : Command
                     Factors = factors ?? Array.Empty<FactorDefinition>()
                 },
                 Source = loader == LoaderType.Sqlite ? connectionString : filePath,
-                OutputPath = outputPath,
+                OutputPath = outputDirectory,
                 LoaderType = loader,
                 FuserType = fuser,
                 WriterType = writer
             };
 
-            System.Console.WriteLine("Pipeline configuration:");
-            System.Console.WriteLine($"Instruments: {string.Join(", ", pipelineDefinition.Dataset.Instruments.Select(i => i.Symbol))}");
-            System.Console.WriteLine($"Timeframe: {pipelineDefinition.Dataset.Timeframe}");
-            System.Console.WriteLine($"Start Date: {pipelineDefinition.Dataset.StartDate:yyyy-MM-dd}");
-            System.Console.WriteLine($"End Date: {pipelineDefinition.Dataset.EndDate:yyyy-MM-dd}");
-            System.Console.WriteLine($"Factors: {string.Join(", ", pipelineDefinition.Dataset.Factors.Select(f => f.Name))}");
-            System.Console.WriteLine($"Source: {pipelineDefinition.Source}");
-            System.Console.WriteLine($"Output Path: {pipelineDefinition.OutputPath}");
-            System.Console.WriteLine($"Loader Type: {pipelineDefinition.LoaderType}");
-            System.Console.WriteLine($"Fuser Type: {pipelineDefinition.FuserType}");
-            System.Console.WriteLine($"Writer Type: {pipelineDefinition.WriterType}");
+            var pipelineRunner = new PipelineRunner(loggerFactory);
 
-            //testing sqlite connection
-            if (pipelineDefinition.LoaderType == LoaderType.Sqlite)
-            {
-                try
-                {
-                    using var connection = new SqliteConnection(pipelineDefinition.Source);
-                    await connection.OpenAsync();
-                    var query = "SELECT name FROM sqlite_master WHERE type='table' LIMIT 1;";
-                    using var command = new SqliteCommand(query, connection);
-                    var result = await command.ExecuteScalarAsync();
-                    if (result != null)
-                        System.Console.WriteLine($"Successfully connected to SQLite database. First table name: {result}");
-                
-                    else
-                        System.Console.WriteLine("Successfully connected to SQLite database, but no tables were found.");
-                }
-                catch (Exception ex)
-                {
-                    System.Console.WriteLine($"Failed to connect to SQLite database: {ex.Message}");
-                }
-            }
-
-            //testing file path
-            if (pipelineDefinition.LoaderType == LoaderType.Csv)
-            {
-                var fileName = "{0}_{1}_{2}_{3}.csv";
-                 fileName = string.Format(fileName, pipelineDefinition.Dataset.Instruments[0].Symbol,
-                    pipelineDefinition.Dataset.Timeframe.ToString().ToLower(),
-                    pipelineDefinition.Dataset.StartDate.ToString("yyyyMMdd"),
-                    pipelineDefinition.Dataset.EndDate.ToString("yyyyMMdd"));
-                 var testFilePath = Path.Combine(pipelineDefinition.Source, fileName);
-
-                if (File.Exists(testFilePath))                
-                    System.Console.WriteLine($"Successfully found the data file at: {testFilePath}");
-            
-                else
-                    System.Console.WriteLine($"Data file not found at: {testFilePath}");
-            }
-            await Task.CompletedTask;
+            await pipelineRunner.RunAsync(pipelineDefinition);
         });
+    }
+
+    private static string BuildRunId(string subcommand, IReadOnlyList<InstrumentDefinition> instruments)
+    {
+        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        var symbols = string.Join("-", instruments.Select(instrument => instrument.Symbol.Trim()));
+        return $"{timestamp}_{subcommand}_{symbols}";
     }
 }

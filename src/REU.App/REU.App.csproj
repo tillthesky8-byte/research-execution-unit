@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\REU.Contracts\REU.Contracts.csproj" />
+    <ProjectReference Include="..\REU.Pipeline\REU.Pipeline.csproj" />
   </ItemGroup>
 
   <ItemGroup>

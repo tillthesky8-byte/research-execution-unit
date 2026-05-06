@@ -16,6 +16,7 @@ public class ConsoleWriter : IWriter
             foreach (var factorData in context.FactorData)            {
                 Console.Write($"{factorData.Key}: {factorData.Value} | ");
             }
+            Console.WriteLine();
         }
         return Task.CompletedTask;
     }

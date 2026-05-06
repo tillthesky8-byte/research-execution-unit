@@ -13,7 +13,6 @@ public class Pipeline : IPipeline
     private readonly InstrumentDefinition[] _instruments;
     private readonly FactorDefinition[] _factors;
     private readonly Timeframe _ohlcvTimeframe;
-    private readonly Timeframe _factorTimeframe;
     private readonly DateTime _startDate;
     private readonly DateTime _endDate;
 
@@ -25,7 +24,6 @@ public class Pipeline : IPipeline
         _instruments = datasetDefinition.Instruments;
         _factors = datasetDefinition.Factors;
         _ohlcvTimeframe = datasetDefinition.Timeframe;
-        _factorTimeframe = datasetDefinition.Timeframe;
         _startDate = datasetDefinition.StartDate;
         _endDate = datasetDefinition.EndDate;
     }
@@ -42,7 +40,7 @@ public class Pipeline : IPipeline
 
         foreach (var factor in _factors)
         {
-            var factorData = await _loader.LoadFactorDataAsync(factor, _factorTimeframe, _startDate, _endDate);
+            var factorData = await _loader.LoadFactorDataAsync(factor, factor.Timeframe, _startDate, _endDate);
             factorDataBySymbol[factor.Name] = factorData;
         }
 

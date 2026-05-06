@@ -1,22 +1,34 @@
 using Contracts.Interfaces;
 using Contracts.Rows;
 using Microsoft.Extensions.Logging;
+using System.IO;
 
 namespace Pipeline.Writers;
 
 public class CsvFileWriter : IWriter
 {
-    private readonly string _filePath;
+    private readonly string _outputPath;
     private readonly ILogger<CsvFileWriter> _logger;
 
-    public CsvFileWriter(string filePath, ILogger<CsvFileWriter> logger)
+    public CsvFileWriter(string outputPath, ILogger<CsvFileWriter> logger)
     {
-        _filePath = filePath;
+        _outputPath = outputPath;
         _logger = logger;
     }
 
     public async Task WriteFrameAsync(IEnumerable<MarketContext> data)
     {
+        var filePath = _outputPath;
+        if (string.IsNullOrWhiteSpace(Path.GetExtension(filePath)))
+        {
+            Directory.CreateDirectory(filePath);
+            filePath = Path.Combine(filePath, "market_context.csv");
+        }
+        else
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? ".");
+        }
+
         var factorColumns = data
             .SelectMany(mc => mc.FactorData
             .Select(f => f.Key))
@@ -35,7 +47,7 @@ public class CsvFileWriter : IWriter
         };
         header.AddRange(factorColumns);
         
-        using var writer = new StreamWriter(_filePath);
+        using var writer = new StreamWriter(filePath);
         
         await writer.WriteLineAsync(string.Join(",", header));
         foreach (var marketContext in data)
