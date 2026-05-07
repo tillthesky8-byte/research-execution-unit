@@ -26,5 +26,8 @@ public static class LogMessages
 
     public static string OnNewTickPortfolioOverview(decimal equity, decimal cash) =>
         $"New Tick - Portfolio Overview: {ConsoleColors.ValueColor}Equity: {equity}{ConsoleColors.Reset}, {ConsoleColors.ValueColor}Cash: {cash}{ConsoleColors.Reset}";
+
+    public static string OnNewTickPendingOrders(int count) =>
+        $"New Tick - Pending Orders: {ConsoleColors.ValueColor}{count}{ConsoleColors.Reset}";
         
 }

@@ -1,67 +1,20 @@
-# Copilot Instructions — REU Project
+# REU Project Guidelines
 
-## Purpose
-REU is a modular trading simulation and research system.  
-The goal is to simulate market behavior, generate signals, allocate capital, and evaluate results.
+## Project Overview
+REU is a C# algorithmic trading simulation and data pipeline system. It comprises data loading, strategy processing, simulation, and execution environments using financial time series and market data types.
 
----
+## Folder Structure
+- `configs/` - Configuration templates and YAML files
+- `data/` - Raw datasets (CSV/SQLite) and sample market data (e.g., EURUSD, US100, interest rates)
+- `src/REU.App/` - Entry point and CLI/Command definitions (Pipeline/Simulator runners)
+- `src/REU.Contracts/` - Core domain models, definitions, interfaces, and enums (e.g., IStrategy, ISimulator, Portfolio, TradeRecord)
+- `src/REU.Modules/` - Reusable financial indicators and trading strategies
+- `src/REU.Pipeline/` - Data pipeline components (Factories, Fusers, Loaders, Writers)
+- `src/REU.Simulator/` - Backtesting and simulation engine (Execution, Recorders, Runners)
+- `tests/REU.Tests/` - Unit tests for the solution
 
-## Architecture Overview
+## Core Development Principles
 
-The system is split into clear layers:
-
-- REU.Contracts → core models, enums, etc. with no dependencies
-- REU.Modules → pluggable behavior (strategies, indicators, models)
-- REU.Pipeline → data flow (loading, alignment, output generation)
-- REU.Simulator → simulation runtime (execution loop, broker, portfolio)
-- REU.App → CLI entry point and orchestration
-
----
-
-## Design Principles
-
-1. Separation of concerns
-   - Modules must NOT access Pipeline directly
-   - Simulator must NOT perform data loading or preprocessing
-   - Pipeline prepares data; Simulator consumes it
-
-2. Data flow is one-directional
-   MarketContext → Features → Strategy → OrderRequest → Orders → Broker
-
-3. No hidden side effects
-   - Methods should be deterministic where possible
-   - Avoid global mutable state
-
-4. Prefer composition over inheritance
-
-5. Time-series first
-   - Data is sequential
-   - Avoid random access unless necessary
-
-6. Namespaces shouldn't have REU.* in them.  
-
-7. Dictionary's method TryGetValue should be wrapped in helper methods that return nullable value, with explicit and domain-specific names. For example, instead of `dictionary.TryGetValue(key, out value)`, we should have a method like `TryGetStrategy(string strategyName)` that returns `Strategy?`. This improves readability and encapsulates the dictionary access logic.
-
----
-
-## What NOT to generate
-
-- Do NOT introduce database logic into Modules
-- Do NOT couple strategies to file paths or App
-- Do NOT create “god classes” that handle multiple responsibilities
-- Do NOT use backward-fill (lookahead bias)
-
----
-
-## Testing Expectations
-
-- Core logic must be testable without IO
-- Use small sample datasets for tests
-- Deterministic outputs are required
-
----
-
-## Summary
-
-This is a simulation system, not a web app.  
-Keep logic deterministic, modular, and data-driven.
+- **Composition over Inheritance:** Prefer composing objects to share behavior rather than deep inheritance hierarchies.
+- **Namespace Structure:** Namespaces DO NOT strictly follow the folder structure. Specifically, do not include the `REU.*` prefix in the namespace naming (for example, avoid `REU.Contracts.` and use a more top-level naming where appropriate according to existing project conventions).
+- **Domain Helpers:** Wrap dictionary access or `TryGetValue` methods into semantic helper methods that have clear domain names indicating their purpose (e.g., instead of exposing `TryGetValue`, provide methods like `GetOptionOrDefault` or `TryFetchExecutionModel`).

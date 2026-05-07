@@ -48,6 +48,7 @@ internal class Program
             SlippageModel = Enum.TryParse(config["Simulation:SlippageModel"], ignoreCase: true, out SlippageModelType slippageModel)
                 ? slippageModel
                 : SlippageModelType.Default,
+                
             IncludeMarketFrame = config.GetValue("Simulation:IncludeMarketFrame", false),
             IncludeTradeLog = config.GetValue("Simulation:IncludeTradeLog", true),
             IncludeEquityCurve = config.GetValue("Simulation:IncludeEquityCurve", true)
@@ -72,15 +73,6 @@ internal class Program
 
         var resolvedPipelineConfig = app.Services.GetRequiredService<RunPipelineConfig>();
         var resolvedSimulationConfig = app.Services.GetRequiredService<RunSimulationConfig>();
-
-        // logger.LogInformation("Application started with configuration:");
-        // logger.LogInformation("ConnectionString: {valueColor}{ConnectionString}{reset}", ConsoleColors.ValueColor, resolvedPipelineConfig.ConnectionString, ConsoleColors.Reset);
-        // logger.LogInformation("FilePath:         {valueColor}{FilePath}{reset}", ConsoleColors.ValueColor, resolvedPipelineConfig.FilePath, ConsoleColors.Reset);
-        // logger.LogInformation("OutputPath:       {valueColor}{OutputPath}{reset}", ConsoleColors.ValueColor, resolvedPipelineConfig.OutputPath, ConsoleColors.Reset);
-        // logger.LogInformation("LoaderType:       {valueColor}{LoaderType}{reset}", ConsoleColors.ValueColor, resolvedPipelineConfig.LoaderType, ConsoleColors.Reset);
-        // logger.LogInformation("FuserType:        {valueColor}{FuserType}{reset}", ConsoleColors.ValueColor, resolvedPipelineConfig.FuserType, ConsoleColors.Reset);
-        // logger.LogInformation("WriterType:       {valueColor}{WriterType}{reset}", ConsoleColors.ValueColor, resolvedPipelineConfig.WriterType, ConsoleColors.Reset);
-
 
         var rootCommand = new RootCommand("REU Data Processing Application")
         {

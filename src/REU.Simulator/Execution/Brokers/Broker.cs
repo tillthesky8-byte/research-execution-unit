@@ -33,6 +33,7 @@ public class Broker : IBroker
     }
     public void ProcessOrders(MarketContext marketContext, Portfolio portfolio)
     {
+        _logger.LogTrace(LogMessages.OnNewTickPendingOrders(_pendingOrders.Count));
         var toRemove = new List<Order>();
         foreach (var pending in _pendingOrders)
         {

@@ -12,6 +12,7 @@ public static class StrategyFactory
         return type switch
         {
             StrategyType.BBB => new BBB(loggerFactory.CreateLogger<BBB>()),
+            StrategyType.BBBV2 => new BBBV2(loggerFactory.CreateLogger<BBBV2>()),
             _ => throw new NotImplementedException($"Strategy type {type} is not implemented.")
         };
     }

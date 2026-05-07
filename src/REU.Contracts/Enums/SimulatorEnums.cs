@@ -12,4 +12,4 @@ public enum TradeAction { Open, ScaleIn, PartialClose, Close, Reverse }
 
 public enum SlippageModelType { Default }
 public enum ComissionModelType { Default }
-public enum StrategyType { BBB }
+public enum StrategyType { BBB, BBBV2 }
