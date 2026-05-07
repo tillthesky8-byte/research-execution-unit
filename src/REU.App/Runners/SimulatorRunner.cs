@@ -37,12 +37,11 @@ public sealed class SimulatorRunner
 
         var marketData = await pipeline.ExecuteAsync();
 
-        if (includeMarketFrame && pipelineDefinition.WriterType != WriterType.None) await pipeline.WriteFrameAsync(marketData);
-
         var simulationResult = simulator.Run(marketData);
 
         if (includeTradeLog && pipelineDefinition.WriterType != WriterType.None) await pipeline.WriteTradeLogAsync(simulationResult.Trades);
         if (includeEquityCurve && pipelineDefinition.WriterType != WriterType.None) await pipeline.WriteEquityCurveAsync(simulationResult.EquityCurve);
+        if (includeMarketFrame && pipelineDefinition.WriterType != WriterType.None) await pipeline.WriteFrameAsync(marketData);
         
         var report = simulationResult.ToString();
         

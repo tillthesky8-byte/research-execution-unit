@@ -13,7 +13,7 @@ public static class WriterFactory
         {
             WriterType.CsvFile => new CsvFileWriter(path, loggerFactory.CreateLogger<CsvFileWriter>()),
             WriterType.ParquetFile => throw new NotImplementedException("Parquet file writer is not implemented yet."),
-            WriterType.JsonFile => throw new NotImplementedException("Json file writer is not implemented yet."),
+            WriterType.JsonFile => new JsonWriter(path, loggerFactory.CreateLogger<JsonWriter>()),
             WriterType.Console => new ConsoleWriter(),
             _ => throw new NotImplementedException($"Writer type {type} is not implemented.")
         };

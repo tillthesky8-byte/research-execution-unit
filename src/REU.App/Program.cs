@@ -83,6 +83,13 @@ internal class Program
         return await rootCommand.Parse(args).InvokeAsync();
     }
 
+    public static string BuildRunId(string subcommand, IReadOnlyList<InstrumentDefinition> instruments, StrategyDefinition strategyDefinition)
+    {
+        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        var symbols = string.Join("-", instruments.Select(instrument => instrument.Symbol.Trim()));
+        return $"{timestamp}_{subcommand}_{symbols}_{strategyDefinition.Type}";
+    }
+    
     public static string BuildRunId(string subcommand, IReadOnlyList<InstrumentDefinition> instruments)
     {
         var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");

@@ -93,7 +93,7 @@ public class RunSimulationCommand : Command
             if (startDate > endDate)
                 throw new ArgumentException("Start date cannot be later than end date.");
 
-            var runId = Program.BuildRunId("simulation", instruments);
+            var runId = Program.BuildRunId("simulation", instruments, strategy);
             var outputDirectory = Path.Combine(outputPath, runId);
 
             var pipelineDefinition = new PipelineDefinition
