@@ -82,14 +82,14 @@ public class Broker : IBroker
                 return;
             }
 
-            portfolio.AdjustPosition(order.Request.Symbol, order.Request.Quantity, fillPrice);
+            portfolio.AdjustPosition(order.Request.Symbol, order.Request.Quantity, fillPrice, marketContext.Timestamp);
             portfolio.UpdateCash(-totalCost);
             _logger.LogInformation(LogMessages.BuyOrderExecuted(order.Id, order.Request.Symbol, order.Request.Quantity, fillPrice, comission, totalCost));
         }
         else
         {
             // margin account will be implemented later, for now we allow short selling without borrowing constraints
-            portfolio.AdjustPosition(order.Request.Symbol, -order.Request.Quantity, fillPrice);
+            portfolio.AdjustPosition(order.Request.Symbol, -order.Request.Quantity, fillPrice, marketContext.Timestamp);
             portfolio.UpdateCash(totalCost);
            _logger.LogInformation(LogMessages.SellOrderExecuted(order.Id, order.Request.Symbol, order.Request.Quantity, fillPrice, comission, totalCost));
         }

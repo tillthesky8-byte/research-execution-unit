@@ -28,7 +28,7 @@ public class Simulator : ISimulator
         foreach (var context in marketData)
         {
             _logger.LogInformation(LogMessages.OnNewTickPortfolioOverview(_portfolio.GetEquity(context), _portfolio.Cash));
-            
+
             _broker.ProcessOrders(context, _portfolio);
 
             var orders = _strategy.OnTick(context, _portfolio);
@@ -39,6 +39,7 @@ public class Simulator : ISimulator
 
             _recorder.Record(context.Timestamp, _portfolio.GetEquity(context));
         }
+        _recorder.AppendTrades(_portfolio.TradeHistory);
         return _recorder.BuildResult();
     }
     

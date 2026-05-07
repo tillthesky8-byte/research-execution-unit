@@ -23,7 +23,7 @@ public class BBB(ILogger<BBB> logger) : IStrategy
         _period = parameters.TryGetValue("period", out var periodStr) 
             ? int.Parse(periodStr) : 20;
 
-        _stdDevMultiplier = parameters.TryGetValue("stdDevMultiplier", out var stdDevStr)
+        _stdDevMultiplier = parameters.TryGetValue("stdm", out var stdDevStr)
             ? decimal.Parse(stdDevStr) : 2m;
         
         _source = parameters.TryGetValue("source", out var sourceStr)
@@ -45,7 +45,7 @@ public class BBB(ILogger<BBB> logger) : IStrategy
             if (!_bb?.IsReady(symbol) ?? true) continue;
 
             var hasPosition = portfolio.Positions.TryGetValue(symbol, out var position);
-            var allocation = portfolio.Cash * 0.1m; 
+            var allocation = portfolio.Cash * 1m; 
             var quantity = Math.Floor(allocation / bar.Close);
 
             if (!hasPosition || position!.Quantity == 0) 

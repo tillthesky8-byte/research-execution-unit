@@ -1,18 +1,16 @@
 using System.CommandLine;
 using App.Options;
-using App.Runners;
 using Contracts.Configs;
 using Contracts.Definitions;
 using Contracts.Enums;
 using Microsoft.Extensions.Logging;
-using App;
+using App.Runners;
 namespace App.Commands;
 
-public class RunPipelineCommand : Command
+public class RunSimulationCommand : Command
 {
-    public RunPipelineCommand(RunPipelineConfig config, ILoggerFactory loggerFactory) : base("pipeline", "Run the data processing pipeline with the specified configuration.")
+    public RunSimulationCommand(RunSimulationConfig simulationConfig, RunPipelineConfig pipelineConfig, ILoggerFactory loggerFactory) : base("simulation", "Run a backtest simulation with the specified configuration")
     {
-
         var instrumentOption = new InstrumentOption();
         var timeframeOption = new TimeframeOption();
         var startDateOption = new StartDateOption();
@@ -22,10 +20,16 @@ public class RunPipelineCommand : Command
         var connectionStringOption = new ConnectionStringOption();
         var filePathOption = new FilePathOption();
         var outputPathOption = new OutputPathOption();
-        
+
         var loaderOption = new LoaderOption();
         var fuserOption = new FuserOption();
         var writerOption = new WriterOption();
+
+        var strategyOption = new StrategyOption();
+        var initialCashOption = new InitialCashOption();
+        var slippageModelOption = new SlippageModelOption();
+        var comissionModelOption = new ComissionModelOption();
+
 
         Add(instrumentOption);
         Add(timeframeOption);
@@ -41,24 +45,33 @@ public class RunPipelineCommand : Command
         Add(fuserOption);
         Add(writerOption);
 
+        Add(strategyOption);
+        Add(initialCashOption);
+        Add(slippageModelOption);
+        Add(comissionModelOption);
+
+
         SetAction(async (context) =>
         {
-            // note: introduce mapper 
             var instruments = context.GetValue(instrumentOption);
             var timeframe = context.GetValue(timeframeOption);
             var startDate = context.GetValue(startDateOption);
             var endDate = context.GetValue(endDateOption);
             var factors = context.GetValue(factorOption);
-
-            var connectionString = context.GetValue(connectionStringOption) ?? config.ConnectionString;
-            var filePath = context.GetValue(filePathOption) ?? config.FilePath;
-            var outputPath = context.GetValue(outputPathOption) ?? config.OutputPath;
-
-            var loader = context.GetValue(loaderOption) ?? config.LoaderType;
-            var fuser = context.GetValue(fuserOption) ?? config.FuserType;
-            var writer = context.GetValue(writerOption) ?? config.WriterType;
-
-            // note: introduce separate validation layer
+            
+            var connectionString = context.GetValue(connectionStringOption) ?? pipelineConfig.ConnectionString;
+            var filePath = context.GetValue(filePathOption) ?? pipelineConfig.FilePath;
+            var outputPath = context.GetValue(outputPathOption) ?? pipelineConfig.OutputPath;
+            
+            var loader = context.GetValue(loaderOption) ?? pipelineConfig.LoaderType;
+            var fuser = context.GetValue(fuserOption) ?? pipelineConfig.FuserType;
+            var writer = context.GetValue(writerOption) ?? pipelineConfig.WriterType;
+           
+            var strategy = context.GetValue(strategyOption) ?? throw new ArgumentException("Strategy definition is required to run the simulation. Please specify it using --strategy or -strat option.");
+            var initialCash = context.GetValue(initialCashOption) ?? simulationConfig.InitialCash; 
+            var slippageModel = context.GetValue(slippageModelOption) ?? simulationConfig.SlippageModel; 
+            var comissionModel = context.GetValue(comissionModelOption) ?? simulationConfig.ComissionModel; 
+            
             if (instruments == null || instruments.Length == 0)
                 throw new ArgumentException("At least one instrument must be specified using --instrument or -i option.");
 
@@ -68,7 +81,7 @@ public class RunPipelineCommand : Command
             if (startDate > endDate)
                 throw new ArgumentException("Start date cannot be later than end date.");
 
-            var runId = Program.BuildRunId("pipeline", instruments);
+            var runId = Program.BuildRunId("simulation", instruments);
             var outputDirectory = Path.Combine(outputPath, runId);
 
             var pipelineDefinition = new PipelineDefinition
@@ -88,9 +101,16 @@ public class RunPipelineCommand : Command
                 WriterType = writer
             };
 
-            var pipelineRunner = new PipelineRunner(loggerFactory);
+            var simulatorDefinition = new SimulatorDefinition(
+                Strategy:       strategy,
+                InitialCash:    initialCash,
+                SlippageModel:  slippageModel,
+                ComissionModel: comissionModel
+            );
 
-            await pipelineRunner.RunAsync(pipelineDefinition);
+            var simulationRunner = new SimulatorRunner(loggerFactory);
+
+            await simulationRunner.Run(simulatorDefinition, pipelineDefinition);
         });
     }
 }

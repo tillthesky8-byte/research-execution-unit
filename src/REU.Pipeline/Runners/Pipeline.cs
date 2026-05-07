@@ -1,6 +1,7 @@
 using Contracts.Definitions;
 using Contracts.Enums;
 using Contracts.Interfaces;
+using Contracts.Models;
 using Contracts.Rows;
 
 namespace Pipeline.Runners;
@@ -48,9 +49,24 @@ public class Pipeline : IPipeline
         return marketContext;
     }
 
+    public Task WriteEquityCurveAsync(IReadOnlyList<EquityPoint> equityCurve)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task WriteFrameAsync(IReadOnlyList<MarketContext> marketContexts)
     {
         if (marketContexts == null || marketContexts.Count == 0) return;
         await _writer.WriteFrameAsync(marketContexts);
+    }
+
+    public Task WriteTradeLogAsync(IReadOnlyList<Trade> tradeLog)
+    {
+        return _writer.WriteTradeLogAsync(tradeLog);
+    }
+
+    public Task WritePerformanceReportAsync(SimulationResult result)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -1,7 +1,7 @@
 using Contracts.Interfaces;
+using Contracts.Models;
 using Contracts.Rows;
 using Microsoft.Extensions.Logging;
-using System.IO;
 
 namespace Pipeline.Writers;
 
@@ -70,5 +70,45 @@ public class CsvFileWriter : IWriter
             }
         }
         return;
+    }
+    public async Task WriteTradeLogAsync(IEnumerable<Trade> tradeLog)
+    {
+        var filePath = _outputPath;
+        if (string.IsNullOrWhiteSpace(Path.GetExtension(filePath)))
+        {
+            Directory.CreateDirectory(filePath);
+            filePath = Path.Combine(filePath, "trade_log.csv");
+        }
+        else
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? ".");
+        }
+
+        using var writer = new StreamWriter(filePath);
+        var header = new List<string>
+        {
+            "timestamp",
+            "symbol",
+            "side",
+            "action",
+            "quantity",
+            "price"
+        };
+        await writer.WriteLineAsync(string.Join(",", header));
+        
+        foreach (var trade in tradeLog)
+        {
+            var line = new List<string>
+            {
+                trade.Timestamp.ToString("o"),
+                trade.Symbol,
+                trade.Side.ToString(),
+                trade.Action.ToString(),
+                trade.Quantity.ToString(),
+                trade.Price.ToString()
+            };
+            await writer.WriteLineAsync(string.Join(",", line));
+            _logger.LogTrace("Wrote trade log line for symbol {Symbol} at timestamp {Timestamp}", trade.Symbol, trade.Timestamp);
+        }
     }
 }
