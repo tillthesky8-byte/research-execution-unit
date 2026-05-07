@@ -16,7 +16,7 @@ public sealed class SimulatorRunner
         _loggerFactory = loggerFactory;
     }
 
-    public async Task Run(SimulatorDefinition simulatorDefinition, PipelineDefinition pipelineDefinition)
+    public async Task Run(SimulatorDefinition simulatorDefinition, PipelineDefinition pipelineDefinition, bool includeMarketFrame, bool includeTradeLog, bool includeEquityCurve)
     {
         var pipeline = new PipelineBuilder
           (
@@ -37,16 +37,18 @@ public sealed class SimulatorRunner
 
         var marketData = await pipeline.ExecuteAsync();
 
-        if (pipelineDefinition.WriterType != WriterType.None) await pipeline.WriteFrameAsync(marketData);
+        if (includeMarketFrame && pipelineDefinition.WriterType != WriterType.None) await pipeline.WriteFrameAsync(marketData);
 
         var simulationResult = simulator.Run(marketData);
 
-        if (pipelineDefinition.WriterType != WriterType.None) await pipeline.WriteTradeLogAsync(simulationResult.Trades);
+        if (includeTradeLog && pipelineDefinition.WriterType != WriterType.None) await pipeline.WriteTradeLogAsync(simulationResult.Trades);
+        if (includeEquityCurve && pipelineDefinition.WriterType != WriterType.None) await pipeline.WriteEquityCurveAsync(simulationResult.EquityCurve);
         
         var report = simulationResult.ToString();
         
         Console.WriteLine();
         Console.WriteLine(report);
+        Console.WriteLine();
     }
 
 }

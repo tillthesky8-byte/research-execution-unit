@@ -51,7 +51,7 @@ public class Pipeline : IPipeline
 
     public Task WriteEquityCurveAsync(IReadOnlyList<EquityPoint> equityCurve)
     {
-        throw new NotImplementedException();
+        return _writer.WriteEquityCurveAsync(equityCurve);
     }
 
     public async Task WriteFrameAsync(IReadOnlyList<MarketContext> marketContexts)
@@ -63,10 +63,5 @@ public class Pipeline : IPipeline
     public Task WriteTradeLogAsync(IReadOnlyList<Trade> tradeLog)
     {
         return _writer.WriteTradeLogAsync(tradeLog);
-    }
-
-    public Task WritePerformanceReportAsync(SimulationResult result)
-    {
-        throw new NotImplementedException();
     }
 }

@@ -44,10 +44,6 @@ public class Recorder : IRecorder
         double years = duration.TotalDays / 365.25;
         var annualizedReturn = (decimal)Math.Pow((double)(finalEquity / initialEquity), 1 / years) - 1;
 
-
-        var sharpeRatio = ComputeSharp();
-        var sortinoRatio = ComputeSortino();
-
         return new SimulationResult
         (
             EquityCurve:      _equityCurve.AsReadOnly(),
@@ -55,49 +51,8 @@ public class Recorder : IRecorder
             TotalReturn:      totalReturn,
             AnnualizedReturn: annualizedReturn,
             MaxDrawdown:      _maxDrawdown,
-            SharpeRatio:      sharpeRatio,
-            SortinoRatio:     sortinoRatio,
             StartDate:        _equityCurve.First().Timestamp,
             EndDate:          _equityCurve.Last().Timestamp
         );
-    }
-
-    private decimal ComputeSharp(decimal riskFreeRate = 0.0m, int periodsPerYear = 252)
-    {
-        if (_equityCurve.Count < 2)
-            return 0;
-
-        // Assumes one equity point per trading day. For intraday data, adjust periodsPerYear accordingly.
-        var returns = _equityCurve
-            .Zip(_equityCurve.Skip(1), (prev, next) => (next.Equity / prev.Equity) - 1)
-            .ToArray();
-
-        decimal mean = returns.Average();
-        decimal stdDev = (decimal)Math.Sqrt(returns.Average(r => Math.Pow((double)(r - mean), 2)));
-        if (stdDev == 0) return 0;
-
-        return (mean - riskFreeRate / periodsPerYear) / stdDev * (decimal)Math.Sqrt(periodsPerYear);
-    }
-
-    private decimal ComputeSortino(decimal riskFreeRate = 0.0m, int periodsPerYear = 252)
-    {
-        if (_equityCurve.Count < 2)
-            return 0;
-
-        // Assumes one equity point per trading day. For intraday data, adjust periodsPerYear accordingly.
-        var returns = _equityCurve
-            .Zip(_equityCurve.Skip(1), (prev, next) => (next.Equity / prev.Equity) - 1)
-            .ToArray();
-
-        decimal mean = returns.Average();
-        
-        var downsideReturns = returns.Where(r => r < riskFreeRate / periodsPerYear).ToArray();
-        if (downsideReturns.Length == 0)
-            return 0; // No downside returns, undefined ratio
-        
-        decimal downsideStdDev = (decimal)Math.Sqrt(downsideReturns.Average(r => Math.Pow((double)(r - riskFreeRate / periodsPerYear), 2)));
-        if (downsideStdDev == 0) return 0;
-
-        return (mean - riskFreeRate / periodsPerYear) / downsideStdDev * (decimal)Math.Sqrt(periodsPerYear);
     }
 }

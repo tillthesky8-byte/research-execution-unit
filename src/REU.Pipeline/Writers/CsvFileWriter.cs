@@ -16,13 +16,46 @@ public class CsvFileWriter : IWriter
         _logger = logger;
     }
 
+    public Task WriteEquityCurveAsync(IEnumerable<EquityPoint> equityCurve)
+    {
+        var filePath = _outputPath;
+        if (string.IsNullOrWhiteSpace(Path.GetExtension(filePath)))
+        {
+            Directory.CreateDirectory(filePath);
+            filePath = Path.Combine(filePath, "equity_curve.csv");
+        }
+        else
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? ".");
+        }
+
+        using var writer = new StreamWriter(filePath);
+        var header = new List<string>
+        {
+            "timestamp",
+            "equity"
+        };
+        writer.WriteLine(string.Join(",", header));
+        
+        foreach (var point in equityCurve)
+        {
+            var line = new List<string>
+            {
+                point.Timestamp.ToString("o"),
+                point.Equity.ToString()
+            };
+            writer.WriteLine(string.Join(",", line));
+            _logger.LogTrace("Wrote equity curve line for timestamp {Timestamp}", point.Timestamp);
+        }
+        return Task.CompletedTask;
+    }
     public async Task WriteFrameAsync(IEnumerable<MarketContext> data)
     {
         var filePath = _outputPath;
         if (string.IsNullOrWhiteSpace(Path.GetExtension(filePath)))
         {
             Directory.CreateDirectory(filePath);
-            filePath = Path.Combine(filePath, "market_context.csv");
+            filePath = Path.Combine(filePath, "market_dataframe.csv");
         }
         else
         {

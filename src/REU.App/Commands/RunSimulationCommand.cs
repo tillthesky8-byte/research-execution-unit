@@ -30,6 +30,10 @@ public class RunSimulationCommand : Command
         var slippageModelOption = new SlippageModelOption();
         var comissionModelOption = new ComissionModelOption();
 
+        var includeMarketFrameOption = new IncludeMarketFrameOption();
+        var includeTradeLogOption = new IncludeTradeLogOption();
+        var includeEquityCurveOption = new IncludeEquityCurveOption();
+
 
         Add(instrumentOption);
         Add(timeframeOption);
@@ -49,6 +53,10 @@ public class RunSimulationCommand : Command
         Add(initialCashOption);
         Add(slippageModelOption);
         Add(comissionModelOption);
+
+        Add(includeMarketFrameOption);
+        Add(includeTradeLogOption);
+        Add(includeEquityCurveOption);
 
 
         SetAction(async (context) =>
@@ -71,6 +79,10 @@ public class RunSimulationCommand : Command
             var initialCash = context.GetValue(initialCashOption) ?? simulationConfig.InitialCash; 
             var slippageModel = context.GetValue(slippageModelOption) ?? simulationConfig.SlippageModel; 
             var comissionModel = context.GetValue(comissionModelOption) ?? simulationConfig.ComissionModel; 
+
+            var includeMarketFrame = context.GetValue(includeMarketFrameOption) ?? simulationConfig.IncludeMarketFrame;
+            var includeTradeLog = context.GetValue(includeTradeLogOption) ?? simulationConfig.IncludeTradeLog;
+            var includeEquityCurve = context.GetValue(includeEquityCurveOption) ?? simulationConfig.IncludeEquityCurve;
             
             if (instruments == null || instruments.Length == 0)
                 throw new ArgumentException("At least one instrument must be specified using --instrument or -i option.");
@@ -110,7 +122,7 @@ public class RunSimulationCommand : Command
 
             var simulationRunner = new SimulatorRunner(loggerFactory);
 
-            await simulationRunner.Run(simulatorDefinition, pipelineDefinition);
+            await simulationRunner.Run(simulatorDefinition, pipelineDefinition, includeMarketFrame: includeMarketFrame, includeTradeLog: includeTradeLog, includeEquityCurve: includeEquityCurve);
         });
     }
 }

@@ -7,8 +7,6 @@ public record SimulationResult(
     decimal TotalReturn,
     decimal AnnualizedReturn,
     decimal MaxDrawdown,
-    decimal SharpeRatio,
-    decimal SortinoRatio,
     DateTime StartDate,
     DateTime EndDate
 
@@ -22,8 +20,6 @@ public record SimulationResult(
         Total Return:      {TotalReturn:P2}
         Annualized Return: {AnnualizedReturn:P2}
         Max Drawdown:      {MaxDrawdown:P2}
-        Sharpe Ratio:      {SharpeRatio:F2}
-        Sortino Ratio:     {SortinoRatio:F2}
         Total Commission:  {TotalCommission:C}
         Total Trades:      {Trades.Count}
         ────────────────────────────────

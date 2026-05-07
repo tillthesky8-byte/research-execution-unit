@@ -47,8 +47,14 @@ internal class Program
                 : ComissionModelType.Default,
             SlippageModel = Enum.TryParse(config["Simulation:SlippageModel"], ignoreCase: true, out SlippageModelType slippageModel)
                 ? slippageModel
-                : SlippageModelType.Default
+                : SlippageModelType.Default,
+            IncludeMarketFrame = config.GetValue("Simulation:IncludeMarketFrame", false),
+            IncludeTradeLog = config.GetValue("Simulation:IncludeTradeLog", true),
+            IncludeEquityCurve = config.GetValue("Simulation:IncludeEquityCurve", true)
+            
         };
+
+
 
         builder.Services.AddSingleton(pipelineConfig);
         builder.Services.AddSingleton(simulationConfig);

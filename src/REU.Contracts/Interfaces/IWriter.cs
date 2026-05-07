@@ -8,4 +8,5 @@ public interface IWriter
 {
     public Task WriteFrameAsync(IEnumerable<MarketContext> data);
     public Task WriteTradeLogAsync(IEnumerable<Trade> tradeLog);
+    public Task WriteEquityCurveAsync(IEnumerable<EquityPoint> equityCurve);
 }
