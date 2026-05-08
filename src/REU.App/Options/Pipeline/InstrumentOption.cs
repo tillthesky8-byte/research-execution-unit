@@ -17,21 +17,16 @@ public class InstrumentOption : Option<InstrumentDefinition[]>
     {
         var values = result.Tokens
             .Select(t => t.Value)
-            .Where(v => !string.IsNullOrWhiteSpace(v))
             .ToArray();
 
-        if (values.Length == 0)
-            throw new ArgumentException("At least one instrument must be specified using --instrument or -i option.");
-        
         var instrumentDefinitions = new List<InstrumentDefinition>();
         foreach(var value in values)
         {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Instrument symbol cannot be empty or whitespace.");
             try
             {
                 var instrumentDefinition = ParseInstrumentDefinition(value);
-                instrumentDefinitions.Add(instrumentDefinition);
+                if (instrumentDefinition != null)
+                    instrumentDefinitions.Add(instrumentDefinition);
             }
             catch (ArgumentException ex)
             {

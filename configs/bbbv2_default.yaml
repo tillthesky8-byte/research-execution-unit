@@ -1,0 +1,19 @@
+name: default
+
+instruments:
+  - eurusd
+
+timeframe: m5
+
+startDate: 2020-01-01
+endDate: 2020-12-31
+
+strategy:
+  type: bbbv2
+
+  parameters:
+    MiddlePeriod: 21
+    sideperiod: 951
+    stdm: 2
+    source: "close"
+

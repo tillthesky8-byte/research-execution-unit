@@ -1,0 +1,24 @@
+name: sample
+
+instruments:
+  - eurusd
+  - us500
+  - wig20
+
+factors:
+  - us_interest_rate
+  - gb_interest_rate
+
+timeframe: m5
+
+startDate: 2020-01-01
+endDate: 2020-12-31
+
+strategy:
+  type: bbb
+
+  parameters:
+    period: 14
+    stdm: 2
+    source: close
+

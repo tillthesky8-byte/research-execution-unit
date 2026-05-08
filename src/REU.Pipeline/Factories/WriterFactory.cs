@@ -7,7 +7,7 @@ namespace Pipeline.Factories;
 
 public static class WriterFactory
 {
-    public static IWriter CreateWriter(WriterType type, string path, ILoggerFactory loggerFactory)
+    public static IWriter? CreateWriter(WriterType type, string path, ILoggerFactory loggerFactory)
     {
         return type switch
         {
@@ -15,6 +15,7 @@ public static class WriterFactory
             WriterType.ParquetFile => throw new NotImplementedException("Parquet file writer is not implemented yet."),
             WriterType.JsonFile => new JsonWriter(path, loggerFactory.CreateLogger<JsonWriter>()),
             WriterType.Console => new ConsoleWriter(),
+            WriterType.None => null,
             _ => throw new NotImplementedException($"Writer type {type} is not implemented.")
         };
     }

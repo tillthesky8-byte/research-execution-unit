@@ -23,20 +23,28 @@ internal class Program
         {
             ConnectionString = config["ConnectionStrings:MarketData"]
                 ?? throw new InvalidOperationException("Missing required configuration value 'ConnectionStrings:Default'."),
+            
             FilePath = config["Paths:Source"]
                 ?? throw new InvalidOperationException("Missing required configuration value 'Paths:Source'."),
+            
             OutputPath = config["Paths:OutputPath"]
                 ?? config["Paths:OutputRoot"]
                 ?? throw new InvalidOperationException("Missing required configuration value 'Paths:OutputPath' or 'Paths:OutputRoot'."),
+            
+            ConfigPath = config["Paths:ConfigurationFiles"]
+                ?? throw new InvalidOperationException("Missing required configuration value 'Paths:Config'."),
+            
             LoaderType = Enum.TryParse(config["Pipeline:Loader"], ignoreCase: true, out LoaderType loaderType)
                 ? loaderType
                 : LoaderType.Sqlite,
+            
             FuserType = Enum.TryParse(config["Pipeline:Fuser"], ignoreCase: true, out FuserType fuserType)
                 ? fuserType
                 : FuserType.LastObservationCarriedForward,
+            
             WriterType = Enum.TryParse(config["Pipeline:Writer"], ignoreCase: true, out WriterType writerType)
                 ? writerType
-                : WriterType.CsvFile
+                : WriterType.None
         };
 
         var simulationConfig = new RunSimulationConfig

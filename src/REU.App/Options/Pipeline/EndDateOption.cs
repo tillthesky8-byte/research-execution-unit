@@ -1,7 +1,7 @@
 using System.CommandLine;
 namespace App.Options;
 
-public class EndDateOption : Option<DateTime>
+public class EndDateOption : Option<DateTime?>
 {
     public EndDateOption() : base("--end-date", "-end")
     {

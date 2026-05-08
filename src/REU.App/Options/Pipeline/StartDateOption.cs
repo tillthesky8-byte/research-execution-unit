@@ -2,7 +2,7 @@ using System.CommandLine;
 
 namespace App.Options;
 
-public class StartDateOption : Option<DateTime>
+public class StartDateOption : Option<DateTime?>
 {
     public StartDateOption() : base("--start-date", "-start")
     {

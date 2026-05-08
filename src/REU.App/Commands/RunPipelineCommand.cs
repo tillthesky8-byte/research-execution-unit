@@ -13,50 +13,26 @@ public class RunPipelineCommand : Command
     public RunPipelineCommand(RunPipelineConfig config, ILoggerFactory loggerFactory) : base("pipeline", "Run the data processing pipeline with the specified configuration.")
     {
 
-        var instrumentOption = new InstrumentOption();
-        var timeframeOption = new TimeframeOption();
-        var startDateOption = new StartDateOption();
-        var endDateOption = new EndDateOption();
-        var factorOption = new FactorOption();
+        var opts = new PipelineCommandOptions();
 
-        var connectionStringOption = new ConnectionStringOption();
-        var filePathOption = new FilePathOption();
-        var outputPathOption = new OutputPathOption();
-        
-        var loaderOption = new LoaderOption();
-        var fuserOption = new FuserOption();
-        var writerOption = new WriterOption();
-
-        Add(instrumentOption);
-        Add(timeframeOption);
-        Add(startDateOption);
-        Add(endDateOption);
-        Add(factorOption);
-
-        Add(connectionStringOption);
-        Add(filePathOption);
-        Add(outputPathOption);
-
-        Add(loaderOption);
-        Add(fuserOption);
-        Add(writerOption);
+        foreach (var option in opts.GetAllOptions())
+            Add(option);
 
         SetAction(async (context) =>
         {
-            // note: introduce mapper 
-            var instruments = context.GetValue(instrumentOption);
-            var timeframe = context.GetValue(timeframeOption);
-            var startDate = context.GetValue(startDateOption);
-            var endDate = context.GetValue(endDateOption);
-            var factors = context.GetValue(factorOption);
+            var instruments = context.GetValue(opts.Instruments);
+            var timeframe = context.GetValue(opts.Timeframe);
+            var startDate = context.GetValue(opts.StartDate);
+            var endDate = context.GetValue(opts.EndDate);
+            var factors = context.GetValue(opts.Factors);
 
-            var connectionString = context.GetValue(connectionStringOption) ?? config.ConnectionString;
-            var filePath = context.GetValue(filePathOption) ?? config.FilePath;
-            var outputPath = context.GetValue(outputPathOption) ?? config.OutputPath;
+            var connectionString = config.ConnectionString;
+            var filePath = config.FilePath;
+            var outputPath = config.OutputPath;
 
-            var loader = context.GetValue(loaderOption) ?? config.LoaderType;
-            var fuser = context.GetValue(fuserOption) ?? config.FuserType;
-            var writer = context.GetValue(writerOption) ?? config.WriterType;
+            var loader = config.LoaderType;
+            var fuser = config.FuserType;
+            var writer = config.WriterType;
 
             // note: introduce separate validation layer
             if (instruments == null || instruments.Length == 0)
@@ -77,10 +53,13 @@ public class RunPipelineCommand : Command
                 {
                     Instruments = instruments,
                     Timeframe = timeframe.Value,
-                    StartDate = startDate,  
-                    EndDate = endDate,
+                    StartDate = startDate ?? DateTime.MinValue,  
+                    EndDate = endDate ?? DateTime.MaxValue,
                     Factors = factors ?? Array.Empty<FactorDefinition>()
                 },
+                IncludeEquityCurve = false,
+                IncludeMarketFrame = true,
+                IncludeTradeLog = false,
                 Source = loader == LoaderType.Sqlite ? connectionString : filePath,
                 OutputPath = outputDirectory,
                 LoaderType = loader,

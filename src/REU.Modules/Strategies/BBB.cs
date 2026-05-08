@@ -18,8 +18,11 @@ public class BBB(ILogger<BBB> logger) : IStrategy
     private string? _source;
     private SimpleBollingerBands? _bb;
 
-    public void Initialize(IReadOnlyDictionary<string, string> parameters)
+    public void Initialize(IReadOnlyDictionary<string, string> parametersRaw)
     {
+        _logger.LogDebug("Parameters received for {name} initialization: {Parameters}", nameof(BBB), string.Join(", ", parametersRaw.Select(p => $"{p.Key}={p.Value}")));
+        var parameters = parametersRaw.ToDictionary(p => p.Key, p => p.Value, StringComparer.OrdinalIgnoreCase);
+        
         _period = parameters.TryGetValue("period", out var periodStr) 
             ? int.Parse(periodStr) : 20;
 
@@ -32,6 +35,8 @@ public class BBB(ILogger<BBB> logger) : IStrategy
         _bb = new SimpleBollingerBands(_period, _stdDevMultiplier, _source);
 
         _initialized = true;
+        _logger.LogDebug("{name} strategy initialized with parameters: {Parameters}", nameof(BBB), string.Join(", ", parameters.Select(p => $"{p.Key}={p.Value}")));
+
     }
 
     public IEnumerable<OrderRequest> OnTick(MarketContext context, IReadOnlyPortfolio portfolio)

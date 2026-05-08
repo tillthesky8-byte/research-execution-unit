@@ -27,7 +27,7 @@ public class Simulator : ISimulator
     {
         foreach (var context in marketData)
         {
-            _logger.LogInformation(LogMessages.OnNewTickPortfolioOverview(_portfolio.GetEquity(context), _portfolio.Cash));
+            _logger.LogTrace(LogMessages.OnNewTickPortfolioOverview(_portfolio.GetEquity(context), _portfolio.Cash));
 
             _broker.ProcessOrders(context, _portfolio);
 

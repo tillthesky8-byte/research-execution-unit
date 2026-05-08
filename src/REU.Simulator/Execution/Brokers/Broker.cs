@@ -29,7 +29,7 @@ public class Broker : IBroker
             Request = orderRequest
         };
         _pendingOrders.Add(order);
-        _logger.LogInformation(LogMessages.OrderSubmitted(order.Id, orderRequest.Symbol, orderRequest.Quantity, orderRequest.Type, orderRequest.Side));
+        _logger.LogTrace(LogMessages.OrderSubmitted(order.Id, orderRequest.Symbol, orderRequest.Quantity, orderRequest.Type, orderRequest.Side));
     }
     public void ProcessOrders(MarketContext marketContext, Portfolio portfolio)
     {
@@ -79,20 +79,20 @@ public class Broker : IBroker
         {
             if (portfolio.Cash < totalCost)
             {
-                _logger.LogWarning(LogMessages.NotEnoughCash(order.Id, order.Request.Symbol, totalCost, portfolio.Cash));
+                _logger.LogTrace(LogMessages.NotEnoughCash(order.Id, order.Request.Symbol, totalCost, portfolio.Cash));
                 return;
             }
 
             portfolio.AdjustPosition(order.Request.Symbol, order.Request.Quantity, fillPrice, marketContext.Timestamp);
             portfolio.UpdateCash(-totalCost);
-            _logger.LogInformation(LogMessages.BuyOrderExecuted(order.Id, order.Request.Symbol, order.Request.Quantity, fillPrice, comission, totalCost));
+            _logger.LogTrace(LogMessages.BuyOrderExecuted(order.Id, order.Request.Symbol, order.Request.Quantity, fillPrice, comission, totalCost));
         }
         else
         {
             // margin account will be implemented later, for now we allow short selling without borrowing constraints
             portfolio.AdjustPosition(order.Request.Symbol, -order.Request.Quantity, fillPrice, marketContext.Timestamp);
             portfolio.UpdateCash(totalCost);
-           _logger.LogInformation(LogMessages.SellOrderExecuted(order.Id, order.Request.Symbol, order.Request.Quantity, fillPrice, comission, totalCost));
+           _logger.LogTrace(LogMessages.SellOrderExecuted(order.Id, order.Request.Symbol, order.Request.Quantity, fillPrice, comission, totalCost));
         }
 
 
