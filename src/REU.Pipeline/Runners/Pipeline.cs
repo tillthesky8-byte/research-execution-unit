@@ -3,11 +3,13 @@ using Contracts.Enums;
 using Contracts.Interfaces;
 using Contracts.Models;
 using Contracts.Rows;
+using Microsoft.Extensions.Logging;
 
 namespace Pipeline.Runners;
 
 public class Pipeline : IPipeline
 {
+    private readonly ILogger<Pipeline> _logger;
     private readonly ILoader _loader;
     private readonly IFuser _fuser;
     private readonly IWriter _writer;
@@ -17,7 +19,7 @@ public class Pipeline : IPipeline
     private readonly DateTime _startDate;
     private readonly DateTime _endDate;
 
-    public Pipeline(ILoader loader, IFuser fuser, IWriter writer, DatasetDefinition datasetDefinition)
+    public Pipeline(ILoader loader, IFuser fuser, IWriter writer, DatasetDefinition datasetDefinition, ILogger<Pipeline> logger)
     {
         _loader = loader;
         _fuser = fuser;
@@ -27,6 +29,8 @@ public class Pipeline : IPipeline
         _ohlcvTimeframe = datasetDefinition.Timeframe;
         _startDate = datasetDefinition.StartDate;
         _endDate = datasetDefinition.EndDate;
+        _logger = logger;
+    _logger.LogDebug("Factors received: {Factors}", string.Join(", ", _factors.Select(f => f.Name)));
     }
     public async Task<IReadOnlyList<MarketContext>> ExecuteAsync()
     {

@@ -65,9 +65,10 @@ public class RunSimulationCommand : Command
                 ?? yamlOptions.EndDate 
                 ?? DateTime.MaxValue;
             
-            var factors = context.GetValue(opts.Factors) 
-                ?? yamlOptions.Factors 
-                ?? Array.Empty<FactorDefinition>();
+            var cliFactors = context.GetValue(opts.Factors);
+            var factors = (cliFactors != null && cliFactors.Length > 0)
+                ? cliFactors
+                : (yamlOptions.Factors ?? Array.Empty<FactorDefinition>());
             
             var cliStrategy = context.GetValue(opts.Strategy);
             var strategy = cliStrategy ?? yamlOptions.StrategyDefinition ?? throw new ArgumentException("A strategy must be specified using --strategy or -s option, or in the YAML configuration file.");
@@ -111,6 +112,7 @@ public class RunSimulationCommand : Command
             };
 
             Console.WriteLine($"Starting simulation with instruments: {string.Join(", ", instruments.Select(i => i.Symbol))}");
+            Console.WriteLine($"Starting simulation with factors: {string.Join(", ", factors.Select(f => f.Name))}");
 
             var simulationRunner = new SimulatorRunner(runConfig);
 
