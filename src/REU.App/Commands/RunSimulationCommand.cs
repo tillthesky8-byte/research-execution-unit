@@ -1,6 +1,5 @@
 using System.CommandLine;
 using App.Options;
-using App.Validators;
 using Contracts.Configs;
 using Contracts.Definitions;
 using Contracts.Enums;
@@ -73,10 +72,6 @@ public class RunSimulationCommand : Command
             var cliStrategy = context.GetValue(opts.Strategy);
             var strategy = cliStrategy ?? yamlOptions.StrategyDefinition ?? throw new ArgumentException("A strategy must be specified using --strategy or -s option, or in the YAML configuration file.");
 
-
-            var runId = Program.BuildRunId("simulation", instruments, strategy);
-            var outputDirectory = Path.Combine(outputPath, runId);
-
             var pipelineDefinition = new PipelineDefinition
             {
                 Dataset = new DatasetDefinition
@@ -88,7 +83,7 @@ public class RunSimulationCommand : Command
                     Factors     = factors
                 },
                 Source             = loader == LoaderType.Sqlite ? connectionString : filePath,
-                OutputPath         = outputDirectory,
+                OutputPath         = outputPath,
                 IncludeMarketFrame = includeMarketFrame,
                 IncludeTradeLog    = includeTradeLog,
                 IncludeEquityCurve = includeEquityCurve,
@@ -108,13 +103,9 @@ public class RunSimulationCommand : Command
             {
                 PipelineDefinition  = pipelineDefinition,
                 SimulatorDefinition = simulatorDefinition,
-                LoggerFactory       = loggerFactory
             };
 
-            Console.WriteLine($"Starting simulation with instruments: {string.Join(", ", instruments.Select(i => i.Symbol))}");
-            Console.WriteLine($"Starting simulation with factors: {string.Join(", ", factors.Select(f => f.Name))}");
-
-            var simulationRunner = new SimulatorRunner(runConfig);
+            var simulationRunner = new SimulationRunner(runConfig, loggerFactory);
 
             await simulationRunner.Run();
         });

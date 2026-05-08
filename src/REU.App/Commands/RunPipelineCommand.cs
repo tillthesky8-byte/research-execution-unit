@@ -44,9 +44,6 @@ public class RunPipelineCommand : Command
             if (startDate > endDate)
                 throw new ArgumentException("Start date cannot be later than end date.");
 
-            var runId = Program.BuildRunId("pipeline", instruments);
-            var outputDirectory = Path.Combine(outputPath, runId);
-
             var pipelineDefinition = new PipelineDefinition
             {
                 Dataset = new DatasetDefinition
@@ -61,15 +58,20 @@ public class RunPipelineCommand : Command
                 IncludeMarketFrame = true,
                 IncludeTradeLog = false,
                 Source = loader == LoaderType.Sqlite ? connectionString : filePath,
-                OutputPath = outputDirectory,
+                OutputPath = outputPath,
                 LoaderType = loader,
                 FuserType = fuser,
                 WriterType = writer
             };
 
-            var pipelineRunner = new PipelineRunner(loggerFactory);
+            var runConfig = new RunConfig
+            {
+                PipelineDefinition = pipelineDefinition
+            };
 
-            await pipelineRunner.RunAsync(pipelineDefinition);
+            var pipelineRunner = new PipelineRunner(runConfig, loggerFactory);
+
+            await pipelineRunner.RunAsync();
         });
     }
 }

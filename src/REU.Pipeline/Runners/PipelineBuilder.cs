@@ -17,6 +17,7 @@ public class PipelineBuilder
         _logger = logger;
         _loggerFactory = loggerFactory;
         _pipelineDefinition = pipelineDefinition;
+
     }
 
     public IPipeline BuildPipeline()

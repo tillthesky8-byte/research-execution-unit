@@ -5,7 +5,7 @@ using Contracts.Rows;
 namespace Pipeline.Writers;
 public class ConsoleWriter : IWriter
 {
-    public Task WriteFrameAsync(IEnumerable<MarketContext> data)
+    public Task WriteFrameAsync(IEnumerable<MarketContext> data, string runId)
     {
         foreach (var context in data)
         {
@@ -22,7 +22,7 @@ public class ConsoleWriter : IWriter
         return Task.CompletedTask;
     }
 
-    public Task WriteTradeLogAsync(IEnumerable<Trade> tradeLog)
+    public Task WriteTradeLogAsync(IEnumerable<Trade> tradeLog, string runId)
     {
         foreach (var trade in tradeLog)
         {
@@ -31,7 +31,7 @@ public class ConsoleWriter : IWriter
         return Task.CompletedTask;
     }
 
-    public Task WriteEquityCurveAsync(IEnumerable<EquityPoint> equityCurve)
+    public Task WriteEquityCurveAsync(IEnumerable<EquityPoint> equityCurve, string runId)
     {
         foreach (var point in equityCurve)
         {

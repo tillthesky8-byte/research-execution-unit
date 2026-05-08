@@ -2,7 +2,6 @@ using Contracts.Interfaces;
 using Contracts.Models;
 using Contracts.Rows;
 using Microsoft.Extensions.Logging;
-
 namespace Pipeline.Writers;
 
 public class JsonWriter : IWriter
@@ -16,9 +15,9 @@ public class JsonWriter : IWriter
         _logger = logger;
     }
 
-    public Task WriteEquityCurveAsync(IEnumerable<EquityPoint> equityCurve)
+    public Task WriteEquityCurveAsync(IEnumerable<EquityPoint> equityCurve, string runId)
     {
-        var filePath = _outputPath;
+        var filePath = Path.Combine(_outputPath, runId);
         if (string.IsNullOrWhiteSpace(Path.GetExtension(filePath)))
         {
             Directory.CreateDirectory(filePath);
@@ -35,9 +34,9 @@ public class JsonWriter : IWriter
         return Task.CompletedTask;
     }
 
-    public Task WriteFrameAsync(IEnumerable<MarketContext> data)
+    public Task WriteFrameAsync(IEnumerable<MarketContext> data, string runId)
     {
-        var filePath = _outputPath;
+        var filePath = Path.Combine(_outputPath, runId);
         if (string.IsNullOrWhiteSpace(Path.GetExtension(filePath)))
         {
             Directory.CreateDirectory(filePath);
@@ -54,9 +53,9 @@ public class JsonWriter : IWriter
         return Task.CompletedTask;
     }
 
-    public Task WriteTradeLogAsync(IEnumerable<Trade> tradeLog)
+    public Task WriteTradeLogAsync(IEnumerable<Trade> tradeLog, string runId)
     {
-        var filePath = _outputPath;
+        var filePath = Path.Combine(_outputPath, runId);
         if (string.IsNullOrWhiteSpace(Path.GetExtension(filePath)))
         {
             Directory.CreateDirectory(filePath);

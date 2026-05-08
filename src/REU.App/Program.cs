@@ -8,7 +8,6 @@ using App.Commands;
 using App.Logging;
 using Contracts.Configs;
 using Contracts.Enums;
-using Contracts.Definitions;
 
 namespace App;
 internal class Program
@@ -50,15 +49,19 @@ internal class Program
         var simulationConfig = new RunSimulationConfig
         {
             InitialCash = config.GetValue("Simulation:InitialCash", 100000m),
+
             ComissionModel = Enum.TryParse(config["Simulation:ComissionModel"], ignoreCase: true, out ComissionModelType comissionModel)
                 ? comissionModel
                 : ComissionModelType.Default,
+
             SlippageModel = Enum.TryParse(config["Simulation:SlippageModel"], ignoreCase: true, out SlippageModelType slippageModel)
                 ? slippageModel
                 : SlippageModelType.Default,
                 
             IncludeMarketFrame = config.GetValue("Simulation:IncludeMarketFrame", false),
+
             IncludeTradeLog = config.GetValue("Simulation:IncludeTradeLog", true),
+            
             IncludeEquityCurve = config.GetValue("Simulation:IncludeEquityCurve", true)
             
         };
@@ -89,19 +92,5 @@ internal class Program
         };
 
         return await rootCommand.Parse(args).InvokeAsync();
-    }
-
-    public static string BuildRunId(string subcommand, IReadOnlyList<InstrumentDefinition> instruments, StrategyDefinition strategyDefinition)
-    {
-        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-        var symbols = string.Join("-", instruments.Select(instrument => instrument.Symbol.Trim()));
-        return $"{timestamp}_{subcommand}_{symbols}_{strategyDefinition.Type}";
-    }
-    
-    public static string BuildRunId(string subcommand, IReadOnlyList<InstrumentDefinition> instruments)
-    {
-        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-        var symbols = string.Join("-", instruments.Select(instrument => instrument.Symbol.Trim()));
-        return $"{timestamp}_{subcommand}_{symbols}";
     }
 }

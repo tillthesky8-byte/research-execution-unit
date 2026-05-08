@@ -16,9 +16,9 @@ public class CsvFileWriter : IWriter
         _logger = logger;
     }
 
-    public Task WriteEquityCurveAsync(IEnumerable<EquityPoint> equityCurve)
+    public Task WriteEquityCurveAsync(IEnumerable<EquityPoint> equityCurve, string runId)
     {
-        var filePath = _outputPath;
+        var filePath = Path.Combine(_outputPath, runId);
         if (string.IsNullOrWhiteSpace(Path.GetExtension(filePath)))
         {
             Directory.CreateDirectory(filePath);
@@ -49,9 +49,9 @@ public class CsvFileWriter : IWriter
         }
         return Task.CompletedTask;
     }
-    public async Task WriteFrameAsync(IEnumerable<MarketContext> data)
+    public async Task WriteFrameAsync(IEnumerable<MarketContext> data, string runId)
     {
-        var filePath = _outputPath;
+        var filePath = Path.Combine(_outputPath, runId);
         if (string.IsNullOrWhiteSpace(Path.GetExtension(filePath)))
         {
             Directory.CreateDirectory(filePath);
@@ -104,9 +104,9 @@ public class CsvFileWriter : IWriter
         }
         return;
     }
-    public async Task WriteTradeLogAsync(IEnumerable<Trade> tradeLog)
+    public async Task WriteTradeLogAsync(IEnumerable<Trade> tradeLog, string runId)
     {
-        var filePath = _outputPath;
+        var filePath = Path.Combine(_outputPath, runId);
         if (string.IsNullOrWhiteSpace(Path.GetExtension(filePath)))
         {
             Directory.CreateDirectory(filePath);

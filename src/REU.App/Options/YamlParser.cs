@@ -40,12 +40,12 @@ public class YamlSimulationOptions
         
         StrategyDefinition = config.Strategy == null ? null : new StrategyDefinition(config.Strategy.Type, config.Strategy.Parameters ?? new Dictionary<string, string>());
 
-        Console.WriteLine($"Loaded YAML configuration from {filePath}:");
-        Console.WriteLine($"  Instruments: {string.Join(", ", Instruments?.Select(i => i.Symbol) ?? Array.Empty<string>())}");
-        Console.WriteLine($"  Timeframe: {Timeframe}");
-        Console.WriteLine($"  StartDate: {StartDate}");
-        Console.WriteLine($"  EndDate: {EndDate}");
-        Console.WriteLine($"  Factors: {string.Join(", ", Factors?.Select(f => f.Name) ?? Array.Empty<string>())}");
-        Console.WriteLine($"  Strategy: {StrategyDefinition?.Type} with parameters {string.Join(", ", StrategyDefinition?.Parameters.Select(p => $"{p.Key}={p.Value}") ?? Array.Empty<string>())}");
+        // Console.WriteLine($"Loaded YAML configuration from {filePath}:");
+        // Console.WriteLine($"  Instruments: {string.Join(", ", Instruments?.Select(i => i.Symbol) ?? Array.Empty<string>())}");
+        // Console.WriteLine($"  Timeframe: {Timeframe}");
+        // Console.WriteLine($"  StartDate: {StartDate}");
+        // Console.WriteLine($"  EndDate: {EndDate}");
+        // Console.WriteLine($"  Factors: {string.Join(", ", Factors?.Select(f => f.Name) ?? Array.Empty<string>())}");
+        // Console.WriteLine($"  Strategy: {StrategyDefinition?.Type} with parameters {string.Join(", ", StrategyDefinition?.Parameters.Select(p => $"{p.Key}={p.Value}") ?? Array.Empty<string>())}");
     }
 }

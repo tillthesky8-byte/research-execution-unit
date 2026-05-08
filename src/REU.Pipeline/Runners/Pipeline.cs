@@ -53,19 +53,19 @@ public class Pipeline : IPipeline
         return marketContext;
     }
 
-    public Task WriteEquityCurveAsync(IReadOnlyList<EquityPoint> equityCurve)
+    public Task WriteEquityCurveAsync(IReadOnlyList<EquityPoint> equityCurve, string runId)
     {
-        return _writer.WriteEquityCurveAsync(equityCurve);
+        return _writer.WriteEquityCurveAsync(equityCurve, runId);
     }
 
-    public async Task WriteFrameAsync(IReadOnlyList<MarketContext> marketContexts)
+    public async Task WriteFrameAsync(IReadOnlyList<MarketContext> marketContexts, string runId)
     {
         if (marketContexts == null || marketContexts.Count == 0) return;
-        await _writer.WriteFrameAsync(marketContexts);
+        await _writer.WriteFrameAsync(marketContexts, runId);
     }
 
-    public Task WriteTradeLogAsync(IReadOnlyList<Trade> tradeLog)
+    public Task WriteTradeLogAsync(IReadOnlyList<Trade> tradeLog, string runId)
     {
-        return _writer.WriteTradeLogAsync(tradeLog);
+        return _writer.WriteTradeLogAsync(tradeLog, runId);
     }
 }
