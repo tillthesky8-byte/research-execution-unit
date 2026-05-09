@@ -24,6 +24,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\REU.Contracts\REU.Contracts.csproj" />
     <ProjectReference Include="..\..\src\REU.Pipeline\REU.Pipeline.csproj" />
+    <ProjectReference Include="..\..\src\REU.Writer\REU.Writer.csproj" />
+    <ProjectReference Include="..\..\src\REU.App\REU.App.csproj" />
   </ItemGroup>
 
 </Project>

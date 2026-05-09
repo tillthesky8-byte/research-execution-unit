@@ -1,7 +1,9 @@
+using Contracts.Configs;
 using Contracts.Interfaces;
 using Contracts.Models;
 using Contracts.Rows;
 using Microsoft.Extensions.Logging;
+using Writer.Indexers;
 
 namespace Writer.Runners;
 
@@ -9,21 +11,21 @@ namespace Writer.Runners;
 public sealed class Writer
 {
     private readonly IManager        _outputManager;
+    private readonly IIndexer        _indexer;
     private readonly ILogger<Writer> _logger;
     private readonly string          _runId;
     private readonly string          _outputDirectory;
-    private readonly ILoggerFactory  _loggerFactory;
     private readonly bool            _includeOhlcvFrames;
     private readonly bool            _includeTradeLog;
     private readonly bool            _includePositionLog;
 
-    public Writer(IManager outputManager, ILogger<Writer> logger, string runId, string outputDirectory, ILoggerFactory loggerFactory, bool includeOhlcvFrames, bool includeTradeLog, bool includePositionLog)
+    public Writer(IManager outputManager, IIndexer indexer, ILogger<Writer> logger, string runId, string outputDirectory, bool includeOhlcvFrames, bool includeTradeLog, bool includePositionLog)
     {
         _outputManager = outputManager;
+        _indexer = indexer;
         _logger = logger;
         _runId = runId;
         _outputDirectory = outputDirectory;
-        _loggerFactory = loggerFactory;
         _includeOhlcvFrames = includeOhlcvFrames;
         _includeTradeLog = includeTradeLog;
         _includePositionLog = includePositionLog;
@@ -31,6 +33,10 @@ public sealed class Writer
 
     public bool Write(OutputBundle outputBundle)
     {
+        WriteRunConfig(outputBundle.RunConfig ?? throw new ArgumentException("RunConfig must be provided in OutputBundle for writing."));
+
+        _indexer.RecreateIndex();
+
         if (_includeOhlcvFrames && outputBundle.MarketData is not null)
                 WriteFrames(outputBundle.MarketData);
         else     
@@ -65,6 +71,11 @@ public sealed class Writer
     private void WriteEquityCurve(IReadOnlyList<EquityPoint> equityCurve)
     {
         _outputManager.SaveSeries(equityCurve, "equity_curve");
+    }
+
+    private void WriteRunConfig(RunConfig runConfig)
+    {
+        _outputManager.SaveObject(runConfig, "config");
     }
 
 }

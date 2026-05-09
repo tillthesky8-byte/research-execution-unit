@@ -36,6 +36,18 @@ public sealed class Manager : IManager
 
     }
 
+    public void SaveObject<T>(T obj, string objectName)
+    {
+        CreateOutputDirectoryIfNotExists();
+
+        var filePath = Path.Combine(_outputDirectory, _runId, $"{objectName}.json");
+        var json     = JsonSerializer.Serialize(obj, _jsonOptions);
+
+        File.WriteAllText(filePath, json);
+
+        _logger.LogDebug("Saved object {ObjectName} to {FilePath}", objectName, filePath);
+    }
+
 
     private void CreateOutputDirectoryIfNotExists()
     {

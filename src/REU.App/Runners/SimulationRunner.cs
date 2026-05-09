@@ -34,7 +34,7 @@ public sealed class SimulationRunner
         //=========================================================================
         // BUILD COMPONENTS
         //=========================================================================
-        var pipeline = new PipelineBuilder
+        var pipeline  = new PipelineBuilder
           (
               _loggerFactory.CreateLogger<PipelineBuilder>(),
               _loggerFactory,
@@ -50,7 +50,7 @@ public sealed class SimulationRunner
         )
         .BuildSimulator();
 
-        var writer = new WriterBuilder
+        var writer    = new WriterBuilder
         (
             _loggerFactory.CreateLogger<WriterBuilder>(),
             _loggerFactory,
@@ -69,7 +69,8 @@ public sealed class SimulationRunner
         var writerOutput     = writer.Write(new OutputBundle
         {
             MarketData       = marketData.AsList(),
-            SimulationResult = simulationResult
+            SimulationResult = simulationResult,
+            RunConfig        = _runConfig
         });
 
         

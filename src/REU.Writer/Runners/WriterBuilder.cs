@@ -1,7 +1,7 @@
 using Contracts.Definitions;
 using Microsoft.Extensions.Logging;
 using Writer.Output;
-
+using Writer.Factories;
 namespace Writer.Runners;
 
 public class WriterBuilder
@@ -18,9 +18,20 @@ public class WriterBuilder
 
     public Writer BuildWriter(string runId)
     {
-        var outputManager = new Manager(_outputDefinition.OutputPath, runId, _loggerFactory.CreateLogger<Manager>());
+        var outputManager = ManagerFactory.CreateManager(_outputDefinition.ManagerType, _outputDefinition.OutputPath, runId, _loggerFactory);
+        var indexer = IndexerFactory.CreateIndexer(_outputDefinition.IndexerType, _outputDefinition.OutputPath, _loggerFactory);
         
         _logger.LogDebug("Writer is built with: OutputPath: {OutputPath}, IncludeOhlcvFrames: {IncludeOhlcvFrames}, IncludeTradeLog: {IncludeTradeLog}, IncludeEquityCurve: {IncludeEquityCurve}", _outputDefinition.OutputPath, _outputDefinition.IncludeOhlcvFrames, _outputDefinition.IncludeTradeLog, _outputDefinition.IncludeEquityCurve);
-        return new Writer(outputManager, _loggerFactory.CreateLogger<Writer>(), runId, _outputDefinition.OutputPath, _loggerFactory, _outputDefinition.IncludeOhlcvFrames, _outputDefinition.IncludeTradeLog, _outputDefinition.IncludeEquityCurve);
+        return new Writer
+        (
+            outputManager:      outputManager,
+            indexer:            indexer,
+            logger:             _loggerFactory.CreateLogger<Writer>(),
+            runId:              runId,
+            outputDirectory:    _outputDefinition.OutputPath,
+            includeOhlcvFrames: _outputDefinition.IncludeOhlcvFrames,
+            includeTradeLog:    _outputDefinition.IncludeTradeLog,
+            includePositionLog: _outputDefinition.IncludeEquityCurve
+        );
     }
 }

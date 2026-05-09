@@ -3,7 +3,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Pipeline.Fusers;
 
-namespace REU.Tests.Pipeline.Fusers;
+namespace Tests.Pipeline.Fusers;
 
 public class FuserLOCFTests
 {
