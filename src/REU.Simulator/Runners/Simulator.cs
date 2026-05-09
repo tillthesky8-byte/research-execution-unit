@@ -23,7 +23,7 @@ public class Simulator : ISimulator
         _recorder = recorder;
     }
 
-    public SimulationResult Run(IEnumerable<MarketContext> marketData)
+    public SimulationResult Run(IEnumerable<MarketRow> marketData)
     {
         foreach (var context in marketData)
         {

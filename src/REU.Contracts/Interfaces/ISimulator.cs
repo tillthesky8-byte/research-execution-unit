@@ -5,5 +5,5 @@ namespace Contracts.Interfaces;
 
 public interface ISimulator
 {
-    SimulationResult Run(IEnumerable<MarketContext> marketData); 
+    SimulationResult Run(IEnumerable<MarketRow> marketData); 
 }

@@ -49,7 +49,7 @@ public class CsvFileWriter : IWriter
         }
         return Task.CompletedTask;
     }
-    public async Task WriteFrameAsync(IEnumerable<MarketContext> data, string runId)
+    public async Task WriteFrameAsync(IEnumerable<MarketRow> data, string runId)
     {
         var filePath = Path.Combine(_outputPath, runId);
         if (string.IsNullOrWhiteSpace(Path.GetExtension(filePath)))
@@ -83,13 +83,13 @@ public class CsvFileWriter : IWriter
         using var writer = new StreamWriter(filePath);
         
         await writer.WriteLineAsync(string.Join(",", header));
-        foreach (var marketContext in data)
+        foreach (var MarketRow in data)
         {
-            foreach (var priceData in marketContext.PriceData)
+            foreach (var priceData in MarketRow.PriceData)
             {
                 var line = new List<string>
                 {
-                    marketContext.Timestamp.ToString("o"),
+                    MarketRow.Timestamp.ToString("o"),
                     priceData.Key,
                     priceData.Value.Open.ToString(),
                     priceData.Value.High.ToString(),
@@ -97,9 +97,9 @@ public class CsvFileWriter : IWriter
                     priceData.Value.Close.ToString(),
                     priceData.Value.Volume.ToString()
                 };
-                line.AddRange(factorColumns.Select(fc => marketContext.FactorData.TryGetValue(fc, out var factorValue) ? factorValue?.ToString() ?? "" : ""));
+                line.AddRange(factorColumns.Select(fc => MarketRow.FactorData.TryGetValue(fc, out var factorValue) ? factorValue?.ToString() ?? "" : ""));
                 await writer.WriteLineAsync(string.Join(",", line));
-                _logger.LogTrace("Wrote line for symbol {Symbol} at timestamp {Timestamp}", priceData.Key, marketContext.Timestamp);
+                _logger.LogTrace("Wrote line for symbol {Symbol} at timestamp {Timestamp}", priceData.Key, MarketRow.Timestamp);
             }
         }
         return;

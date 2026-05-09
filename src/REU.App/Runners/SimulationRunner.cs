@@ -1,9 +1,11 @@
 using Contracts.Definitions;
 using Microsoft.Extensions.Logging;
+using Contracts.Models;
 using Pipeline.Runners;
 using Simulator.Runners;
-using Contracts.Enums;
 using Contracts.Configs;
+using Writer.Runners;
+using Dapper;
 
 namespace App.Runners;
 
@@ -13,6 +15,8 @@ public sealed class SimulationRunner
     private readonly ILoggerFactory      _loggerFactory;
     private readonly PipelineDefinition  _pipelineDefinition;
     private readonly SimulatorDefinition _simulatorDefinition;
+    private readonly OutputDefinition    _outputDefinition;
+    private readonly ILogger<SimulationRunner> _logger;
 
     public SimulationRunner(RunConfig runConfig, ILoggerFactory loggerFactory)
     {
@@ -20,11 +24,16 @@ public sealed class SimulationRunner
         _loggerFactory       = loggerFactory;
         _pipelineDefinition  = runConfig.PipelineDefinition  ?? throw new ArgumentException("PipelineDefinition must be provided in RunConfig.");
         _simulatorDefinition = runConfig.SimulatorDefinition ?? throw new ArgumentException("SimulatorDefinition must be provided in RunConfig.");
+        _outputDefinition    = runConfig.OutputDefinition    ?? throw new ArgumentException("OutputDefinition must be provided in RunConfig.");
         _runId = runConfig.RunId;
+        _logger = loggerFactory.CreateLogger<SimulationRunner>();
     }
 
     public async Task Run()
     {
+        //=========================================================================
+        // BUILD COMPONENTS
+        //=========================================================================
         var pipeline = new PipelineBuilder
           (
               _loggerFactory.CreateLogger<PipelineBuilder>(),
@@ -41,21 +50,34 @@ public sealed class SimulationRunner
         )
         .BuildSimulator();
 
+        var writer = new WriterBuilder
+        (
+            _loggerFactory.CreateLogger<WriterBuilder>(),
+            _loggerFactory,
+            _outputDefinition
+        )
+        .BuildWriter(_runId);
 
-        var marketData = await pipeline.ExecuteAsync();
+        //=========================================================================
+        // EXECUTION
+        //=========================================================================
+
+        var marketData       = await pipeline.ExecuteAsync();
 
         var simulationResult = simulator.Run(marketData);
 
-        if (_pipelineDefinition.IncludeTradeLog    && _pipelineDefinition.WriterType != WriterType.None) 
-            await pipeline.WriteTradeLogAsync(simulationResult.Trades, _runId);
+        var writerOutput     = writer.Write(new OutputBundle
+        {
+            MarketData       = marketData.AsList(),
+            SimulationResult = simulationResult
+        });
 
-        if (_pipelineDefinition.IncludeEquityCurve && _pipelineDefinition.WriterType != WriterType.None) 
-            await pipeline.WriteEquityCurveAsync(simulationResult.EquityCurve, _runId);
-
-        if (_pipelineDefinition.IncludeMarketFrame && _pipelineDefinition.WriterType != WriterType.None) 
-            await pipeline.WriteFrameAsync(marketData, _runId);
         
-        var report = simulationResult.ToString();
+        //=========================================================================
+        // REPORTING
+        //=========================================================================
+
+        var report           = simulationResult.ToString();
 
         Console.WriteLine();
         Console.WriteLine(report);

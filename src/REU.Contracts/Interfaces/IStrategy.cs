@@ -6,5 +6,5 @@ namespace Contracts.Interfaces;
 public interface IStrategy
 {
     void Initialize(IReadOnlyDictionary<string, string> parameters);
-    IEnumerable<OrderRequest> OnTick(MarketContext context, IReadOnlyPortfolio portfolio);
+    IEnumerable<OrderRequest> OnTick(MarketRow context, IReadOnlyPortfolio portfolio);
 }

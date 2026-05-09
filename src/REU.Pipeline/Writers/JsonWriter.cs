@@ -30,11 +30,11 @@ public class JsonWriter : IWriter
 
         var json = System.Text.Json.JsonSerializer.Serialize(equityCurve);
         File.WriteAllText(filePath, json);
-        _logger.LogInformation("Wrote equity curve to {FilePath}", filePath);
+        _logger.LogDebug("Wrote equity curve to {FilePath}", filePath);
         return Task.CompletedTask;
     }
 
-    public Task WriteFrameAsync(IEnumerable<MarketContext> data, string runId)
+    public Task WriteFrameAsync(IEnumerable<MarketRow> data, string runId)
     {
         var filePath = Path.Combine(_outputPath, runId);
         if (string.IsNullOrWhiteSpace(Path.GetExtension(filePath)))
@@ -49,7 +49,7 @@ public class JsonWriter : IWriter
         
         var json = System.Text.Json.JsonSerializer.Serialize(data);
         File.WriteAllText(filePath, json);
-        _logger.LogInformation("Wrote market frame to {FilePath}", filePath);
+        _logger.LogDebug("Wrote market frame to {FilePath}", filePath);
         return Task.CompletedTask;
     }
 
@@ -68,7 +68,7 @@ public class JsonWriter : IWriter
         
         var json = System.Text.Json.JsonSerializer.Serialize(tradeLog);
         File.WriteAllText(filePath, json);
-        _logger.LogInformation("Wrote trade log to {FilePath}", filePath);
+        _logger.LogDebug("Wrote trade log to {FilePath}", filePath);
         return Task.CompletedTask;
     }
 }

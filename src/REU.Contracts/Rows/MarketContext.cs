@@ -1,6 +1,6 @@
 namespace Contracts.Rows;
 
-public record MarketContext
+public record MarketRow
 {
     public DateTime Timestamp { get; init; }
     public Dictionary<string, OhlcvBar> PriceData { get; init; } = new(StringComparer.OrdinalIgnoreCase);

@@ -23,7 +23,6 @@ public class SimulatorBuilder
     public ISimulator BuildSimulator()
     {
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        _logger.LogInformation("Building simulator...");
 
         var strategy = StrategyFactory.CreateStrategy(_simulatorDefinition.Strategy.Type, _loggerFactory);
         strategy.Initialize(_simulatorDefinition.Strategy.Parameters);
@@ -35,7 +34,7 @@ public class SimulatorBuilder
         var recorder = new Recorder();
 
         stopwatch.Stop();
-        _logger.LogInformation("Simulator built in {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
+        _logger.LogDebug("Simulator built in {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
         return new Simulator(_loggerFactory.CreateLogger<Simulator>(), strategy, broker, portfolio, recorder);
     }
 }

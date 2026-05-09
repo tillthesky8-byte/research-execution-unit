@@ -9,8 +9,10 @@ namespace App.Commands;
 
 public class RunSimulationCommand : Command
 {
+    private readonly ILogger<RunSimulationCommand> _logger;
     public RunSimulationCommand(RunSimulationConfig simulationConfig, RunPipelineConfig pipelineConfig, ILoggerFactory loggerFactory) : base("simulation", "Run a backtest simulation with the specified configuration")
     {
+        _logger = loggerFactory.CreateLogger<RunSimulationCommand>();
         var opts = new SimulationCommandOptions();
 
         foreach (var option in opts.GetAllOptions())
@@ -99,11 +101,22 @@ public class RunSimulationCommand : Command
                 ComissionModel :comissionModel
             );
 
+            var outputDefinition = new OutputDefinition
+            {
+                OutputPath = outputPath,
+                IncludeOhlcvFrames = includeMarketFrame,
+                IncludeTradeLog = includeTradeLog,
+                IncludeEquityCurve = includeEquityCurve,
+            };
+            _logger.LogDebug("OutputDefinition: OutputPath: {OutputPath}, IncludeOhlcvFrames: {IncludeOhlcvFrames}, IncludeTradeLog: {IncludeTradeLog}, IncludeEquityCurve: {IncludeEquityCurve}", outputDefinition.OutputPath, outputDefinition.IncludeOhlcvFrames, outputDefinition.IncludeTradeLog, outputDefinition.IncludeEquityCurve);
+
             var runConfig = new RunConfig
             {
                 PipelineDefinition  = pipelineDefinition,
                 SimulatorDefinition = simulatorDefinition,
+                OutputDefinition    = outputDefinition
             };
+
 
             var simulationRunner = new SimulationRunner(runConfig, loggerFactory);
 

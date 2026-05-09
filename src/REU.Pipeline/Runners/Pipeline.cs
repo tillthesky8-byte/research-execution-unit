@@ -32,7 +32,7 @@ public class Pipeline : IPipeline
         _logger = logger;
     _logger.LogDebug("Factors received: {Factors}", string.Join(", ", _factors.Select(f => f.Name)));
     }
-    public async Task<IReadOnlyList<MarketContext>> ExecuteAsync()
+    public async Task<IReadOnlyList<MarketRow>> ExecuteAsync()
     {
         var ohlcvDataBySymbol = new Dictionary<string, IReadOnlyList<OhlcvRow>>(StringComparer.OrdinalIgnoreCase);
         var factorDataBySymbol = new Dictionary<string, IReadOnlyList<FactorRow>>(StringComparer.OrdinalIgnoreCase);
@@ -49,8 +49,8 @@ public class Pipeline : IPipeline
             factorDataBySymbol[factor.Name] = factorData;
         }
 
-        var marketContext = _fuser.Fuse(ohlcvDataBySymbol, factorDataBySymbol);
-        return marketContext;
+        var MarketRow = _fuser.Fuse(ohlcvDataBySymbol, factorDataBySymbol);
+        return MarketRow;
     }
 
     public Task WriteEquityCurveAsync(IReadOnlyList<EquityPoint> equityCurve, string runId)
@@ -58,10 +58,10 @@ public class Pipeline : IPipeline
         return _writer.WriteEquityCurveAsync(equityCurve, runId);
     }
 
-    public async Task WriteFrameAsync(IReadOnlyList<MarketContext> marketContexts, string runId)
+    public async Task WriteFrameAsync(IReadOnlyList<MarketRow> MarketRows, string runId)
     {
-        if (marketContexts == null || marketContexts.Count == 0) return;
-        await _writer.WriteFrameAsync(marketContexts, runId);
+        if (MarketRows == null || MarketRows.Count == 0) return;
+        await _writer.WriteFrameAsync(MarketRows, runId);
     }
 
     public Task WriteTradeLogAsync(IReadOnlyList<Trade> tradeLog, string runId)

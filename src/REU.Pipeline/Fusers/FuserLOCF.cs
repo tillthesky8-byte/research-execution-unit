@@ -12,12 +12,12 @@ public class FuserLOCF : IFuser
     {
         _logger = logger;
     }
-    public IReadOnlyList<MarketContext> Fuse(IReadOnlyDictionary<string, IReadOnlyList<OhlcvRow>> ohlcvData, IReadOnlyDictionary<string, IReadOnlyList<FactorRow>> factorData)
+    public IReadOnlyList<MarketRow> Fuse(IReadOnlyDictionary<string, IReadOnlyList<OhlcvRow>> ohlcvData, IReadOnlyDictionary<string, IReadOnlyList<FactorRow>> factorData)
     {
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        var marketContexts = InitializeMarketContexts(ohlcvData);
+        var MarketRows = InitializeMarketRows(ohlcvData);
         stopwatch.Stop();
-        _logger.LogDebug("Initialized {Count} market contexts from OHLCV data in {ElapsedMilliseconds} ms", marketContexts.Count, stopwatch.ElapsedMilliseconds);
+        _logger.LogDebug("Initialized {Count} market contexts from OHLCV data in {ElapsedMilliseconds} ms", MarketRows.Count, stopwatch.ElapsedMilliseconds);
 
         stopwatch.Restart();
         var factorCursors = factorData.ToDictionary
@@ -27,7 +27,7 @@ public class FuserLOCF : IFuser
                 StringComparer.OrdinalIgnoreCase
         );
 
-        foreach (var context in marketContexts)
+        foreach (var context in MarketRows)
         {
             foreach (var (factorName, factorRows) in factorData)
             {
@@ -42,13 +42,13 @@ public class FuserLOCF : IFuser
         }
         stopwatch.Stop();
         _logger.LogDebug("Fused factor data into market contexts using LOCF in {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
-        return marketContexts;
+        return MarketRows;
 
     }
 
-    private List<MarketContext> InitializeMarketContexts(IReadOnlyDictionary<string, IReadOnlyList<OhlcvRow>> ohlcvData)
+    private List<MarketRow> InitializeMarketRows(IReadOnlyDictionary<string, IReadOnlyList<OhlcvRow>> ohlcvData)
     {
-        var marketContexts = new List<MarketContext>();
+        var MarketRows = new List<MarketRow>();
         foreach (var (symbol, series) in ohlcvData)
         {
             foreach (var row in series)
@@ -62,7 +62,7 @@ public class FuserLOCF : IFuser
                     Volume = row.Volume
                 };
 
-                var context = new MarketContext
+                var context = new MarketRow
                 {
                     Timestamp = row.Timestamp,
                     PriceData = new Dictionary<string, OhlcvBar>(StringComparer.OrdinalIgnoreCase)
@@ -70,9 +70,9 @@ public class FuserLOCF : IFuser
                         [symbol] = bar
                     }
                 };
-                marketContexts.Add(context);
+                MarketRows.Add(context);
             }
         }
-        return marketContexts;
+        return MarketRows;
     }
 }

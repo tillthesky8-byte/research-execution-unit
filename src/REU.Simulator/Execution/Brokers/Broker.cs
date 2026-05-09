@@ -21,23 +21,23 @@ public class Broker : IBroker
         _slippageModel = slippageModel;
     }
 
-    public void SubmitOrder(OrderRequest orderRequest, MarketContext marketContext, Portfolio portfolio)
+    public void SubmitOrder(OrderRequest orderRequest, MarketRow MarketRow, Portfolio portfolio)
     {
         var order = new Order
         {
-            Timestamp = marketContext.Timestamp,
+            Timestamp = MarketRow.Timestamp,
             Request = orderRequest
         };
         _pendingOrders.Add(order);
         _logger.LogTrace(LogMessages.OrderSubmitted(order.Id, orderRequest.Symbol, orderRequest.Quantity, orderRequest.Type, orderRequest.Side));
     }
-    public void ProcessOrders(MarketContext marketContext, Portfolio portfolio)
+    public void ProcessOrders(MarketRow MarketRow, Portfolio portfolio)
     {
         _logger.LogTrace(LogMessages.OnNewTickPendingOrders(_pendingOrders.Count));
         var toRemove = new List<Order>();
         foreach (var pending in _pendingOrders)
         {
-            if (!marketContext.PriceData.TryGetValue(pending.Request.Symbol, out var symbolBar))
+            if (!MarketRow.PriceData.TryGetValue(pending.Request.Symbol, out var symbolBar))
                 continue;
 
             bool triggered = pending.Request.Type switch
@@ -50,16 +50,16 @@ public class Broker : IBroker
 
             if (triggered)
             {
-                FillOrder(pending, marketContext, portfolio);
+                FillOrder(pending, MarketRow, portfolio);
                 toRemove.Add(pending);
             }
             
         }
         _pendingOrders.RemoveAll(toRemove.Contains);
     }
-    private void FillOrder(Order order, MarketContext marketContext, Portfolio portfolio)
+    private void FillOrder(Order order, MarketRow MarketRow, Portfolio portfolio)
     {
-        if (!marketContext.PriceData.TryGetValue(order.Request.Symbol, out var symbolBar))
+        if (!MarketRow.PriceData.TryGetValue(order.Request.Symbol, out var symbolBar))
             return;
 
         decimal rawPrice = order.Request.Type switch
@@ -70,7 +70,7 @@ public class Broker : IBroker
             _ => throw new ArgumentOutOfRangeException()
         };
 
-        decimal fillPrice = _slippageModel.Apply(rawPrice, order.Request, marketContext);
+        decimal fillPrice = _slippageModel.Apply(rawPrice, order.Request, MarketRow);
         decimal comission = _comissionModel.CalculateCommission(fillPrice, order.Request.Quantity);
 
         decimal totalCost = fillPrice * order.Request.Quantity + (order.Request.Side == OrderSide.Buy ? comission : -comission);
@@ -83,14 +83,14 @@ public class Broker : IBroker
                 return;
             }
 
-            portfolio.AdjustPosition(order.Request.Symbol, order.Request.Quantity, fillPrice, marketContext.Timestamp);
+            portfolio.AdjustPosition(order.Request.Symbol, order.Request.Quantity, fillPrice, MarketRow.Timestamp);
             portfolio.UpdateCash(-totalCost);
             _logger.LogTrace(LogMessages.BuyOrderExecuted(order.Id, order.Request.Symbol, order.Request.Quantity, fillPrice, comission, totalCost));
         }
         else
         {
             // margin account will be implemented later, for now we allow short selling without borrowing constraints
-            portfolio.AdjustPosition(order.Request.Symbol, -order.Request.Quantity, fillPrice, marketContext.Timestamp);
+            portfolio.AdjustPosition(order.Request.Symbol, -order.Request.Quantity, fillPrice, MarketRow.Timestamp);
             portfolio.UpdateCash(totalCost);
            _logger.LogTrace(LogMessages.SellOrderExecuted(order.Id, order.Request.Symbol, order.Request.Quantity, fillPrice, comission, totalCost));
         }

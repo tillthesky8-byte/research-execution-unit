@@ -68,8 +68,8 @@ public class CsvLoader : ILoader
         return Task.FromResult<IReadOnlyList<OhlcvRow>>(records);
     }
 
-    public Task<IReadOnlyList<MarketContext>> LoadMarketContextAsync(InstrumentDefinition instrument, FactorDefinition[] factors, Timeframe timeframe, DateTime start, DateTime end)
+    public Task<IReadOnlyList<MarketRow>> LoadMarketRowAsync(InstrumentDefinition instrument, FactorDefinition[] factors, Timeframe timeframe, DateTime start, DateTime end)
     {
-        throw new NotImplementedException("LoadMarketContextAsync is not implemented in CsvLoader. Please load OHLCV and factor data separately and fuse them using the Fuser.");
+        throw new NotImplementedException("LoadMarketRowAsync is not implemented in CsvLoader. Please load OHLCV and factor data separately and fuse them using the Fuser.");
     }
 }

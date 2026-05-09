@@ -9,15 +9,15 @@ public class Position
     public bool IsLong => Quantity > 0;
     public bool IsShort => Quantity < 0;
     public decimal AverageEntryPrice { get; set; }
-    public decimal GetUnrealizedPnl(MarketContext marketContext)
+    public decimal GetUnrealizedPnl(MarketRow MarketRow)
     {
-        decimal currentPrice = marketContext.PriceData[Symbol].Close;
+        decimal currentPrice = MarketRow.PriceData[Symbol].Close;
         decimal pnlPerUnit = IsLong ? currentPrice - AverageEntryPrice : AverageEntryPrice - currentPrice;
         return pnlPerUnit * Math.Abs(Quantity);
     }
-    public decimal GetMarketValue(MarketContext marketContext)
+    public decimal GetMarketValue(MarketRow MarketRow)
     {        
-        decimal currentPrice = marketContext.PriceData[Symbol].Close;
+        decimal currentPrice = MarketRow.PriceData[Symbol].Close;
         return currentPrice * Quantity;
     }
 }

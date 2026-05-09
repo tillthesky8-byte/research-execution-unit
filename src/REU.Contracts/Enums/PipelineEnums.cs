@@ -7,3 +7,5 @@ public enum LoaderType { Sqlite, Csv, Parquet }
 public enum FuserType { LastObservationCarriedForward }
 
 public enum WriterType { CsvFile, ParquetFile, JsonFile, Console, None }
+
+public enum ManagerType { Default }

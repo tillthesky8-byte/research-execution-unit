@@ -3,7 +3,7 @@ namespace Contracts.Interfaces;
 
 public interface IFuser
 {
-    IReadOnlyList<MarketContext> Fuse
+    IReadOnlyList<MarketRow> Fuse
     (
         IReadOnlyDictionary<string, IReadOnlyList<OhlcvRow>> ohlcvData,
         IReadOnlyDictionary<string, IReadOnlyList<FactorRow>> factorData

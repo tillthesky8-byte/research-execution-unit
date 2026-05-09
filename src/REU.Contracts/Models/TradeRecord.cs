@@ -1,4 +1,5 @@
 using Contracts.Enums;
+using Contracts.Interfaces;
 
 namespace Contracts.Models;
 

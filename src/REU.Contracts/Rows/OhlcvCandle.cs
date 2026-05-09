@@ -1,13 +1,14 @@
 using Contracts.Interfaces;
 
-namespace Contracts.Rows;
+namespace Contracts.Models;
 
-public record OhlcvRow 
+public class OhlcvCandle : IHasTimestamp
 {
-    public DateTime Timestamp { get; init; }
+    public long Timestamp { get; init; }
     public decimal Open { get; init; }
     public decimal High { get; init; }
     public decimal Low { get; init; }
     public decimal Close { get; init; }
     public decimal Volume { get; init; }
+
 }

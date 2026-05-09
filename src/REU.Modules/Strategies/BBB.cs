@@ -39,7 +39,7 @@ public class BBB(ILogger<BBB> logger) : IStrategy
 
     }
 
-    public IEnumerable<OrderRequest> OnTick(MarketContext context, IReadOnlyPortfolio portfolio)
+    public IEnumerable<OrderRequest> OnTick(MarketRow context, IReadOnlyPortfolio portfolio)
     {
         if (!_initialized)
             throw new InvalidOperationException("Strategy not initialized. Call Initialize() before using the strategy.");

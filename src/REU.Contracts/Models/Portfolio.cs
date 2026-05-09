@@ -13,9 +13,9 @@ public sealed class Portfolio(decimal initialCash) : IReadOnlyPortfolio
     public IReadOnlyList<Trade> TradeHistory => _tradeHistory;
     public decimal Cash => _cash;
 
-    public decimal GetEquity(MarketContext marketContext)
+    public decimal GetEquity(MarketRow MarketRow)
     {
-        decimal positionValue = _positions.Values.Sum(p => p.GetMarketValue(marketContext));
+        decimal positionValue = _positions.Values.Sum(p => p.GetMarketValue(MarketRow));
         return positionValue + _cash;
     }
     public void UpdateCash(decimal amount) => _cash += amount;  

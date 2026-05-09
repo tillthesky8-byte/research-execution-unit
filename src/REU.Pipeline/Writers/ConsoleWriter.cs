@@ -5,7 +5,7 @@ using Contracts.Rows;
 namespace Pipeline.Writers;
 public class ConsoleWriter : IWriter
 {
-    public Task WriteFrameAsync(IEnumerable<MarketContext> data, string runId)
+    public Task WriteFrameAsync(IEnumerable<MarketRow> data, string runId)
     {
         foreach (var context in data)
         {

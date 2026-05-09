@@ -77,7 +77,7 @@ public class SqliteLoader : ILoader
         return ohlcvRows.AsList();
     }
 
-    public Task<IReadOnlyList<MarketContext>> LoadMarketContextAsync(InstrumentDefinition instrument, FactorDefinition[] factors, Timeframe timeframe, DateTime start, DateTime end)
+    public Task<IReadOnlyList<MarketRow>> LoadMarketRowAsync(InstrumentDefinition instrument, FactorDefinition[] factors, Timeframe timeframe, DateTime start, DateTime end)
     {
         throw new NotImplementedException("Loading market context directly from SQLite is not implemented. Load OHLCV and factor data separately and fuse in memory.");
     }

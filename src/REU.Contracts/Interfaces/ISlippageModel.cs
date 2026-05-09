@@ -5,5 +5,5 @@ namespace Contracts.Interfaces;
 
 public interface ISlippageModel
 {
-    decimal Apply(decimal rawPrice,  OrderRequest order, MarketContext marketContext);
+    decimal Apply(decimal rawPrice,  OrderRequest order, MarketRow MarketRow);
 }

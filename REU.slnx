@@ -4,5 +4,6 @@
   <Project Path="src/REU.Pipeline/REU.Pipeline.csproj" />
   <Project Path="src/REU.Simulator/REU.Simulator.csproj" />
   <Project Path="src/REU.Modules/REU.Modules.csproj" />
+  <Project Path="src/REU.Writer/REU.Writer.csproj" />
   <Project Path="tests/REU.Tests/REU.Tests.csproj" />
 </Solution>

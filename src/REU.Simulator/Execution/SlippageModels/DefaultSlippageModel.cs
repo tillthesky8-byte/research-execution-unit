@@ -6,6 +6,6 @@ namespace Simulator.Execution.SlippageModels;
 
 public class DefaultSlippageModel : ISlippageModel
 {
-    public decimal Apply(decimal rawPrice, OrderRequest order, MarketContext marketContext) =>
+    public decimal Apply(decimal rawPrice, OrderRequest order, MarketRow MarketRow) =>
         rawPrice; // No slippage applied, return the raw price
 }

@@ -58,11 +58,11 @@ internal class Program
                 ? slippageModel
                 : SlippageModelType.Default,
                 
-            IncludeMarketFrame = config.GetValue("Simulation:IncludeMarketFrame", false),
+            IncludeMarketFrame = config.GetValue("Output:IncludeMarketFrame", false),
 
-            IncludeTradeLog = config.GetValue("Simulation:IncludeTradeLog", true),
+            IncludeTradeLog = config.GetValue("Output:IncludeTradeLog", true),
             
-            IncludeEquityCurve = config.GetValue("Simulation:IncludeEquityCurve", true)
+            IncludeEquityCurve = config.GetValue("Output:IncludeEquityCurve", true)
             
         };
 

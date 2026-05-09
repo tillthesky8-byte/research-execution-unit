@@ -2,5 +2,5 @@ namespace Contracts.Interfaces;
 
 public interface IHasTimestamp
 {
-    DateTime Timestamp { get; init; }
+    long Timestamp { get; init; }
 }
