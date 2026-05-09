@@ -8,6 +8,7 @@ using App.Commands;
 using App.Logging;
 using Contracts.Configs;
 using Contracts.Enums;
+using Contracts.Models;
 
 namespace App;
 internal class Program
@@ -18,59 +19,10 @@ internal class Program
 
         var config = builder.Configuration;
 
-        var pipelineConfig = new RunPipelineConfig
-        {
-            ConnectionString = config["ConnectionStrings:MarketData"]
-                ?? throw new InvalidOperationException("Missing required configuration value 'ConnectionStrings:Default'."),
-            
-            FilePath = config["Paths:Source"]
-                ?? throw new InvalidOperationException("Missing required configuration value 'Paths:Source'."),
-            
-            OutputPath = config["Paths:OutputPath"]
-                ?? config["Paths:OutputRoot"]
-                ?? throw new InvalidOperationException("Missing required configuration value 'Paths:OutputPath' or 'Paths:OutputRoot'."),
-            
-            ConfigPath = config["Paths:ConfigurationFiles"]
-                ?? throw new InvalidOperationException("Missing required configuration value 'Paths:Config'."),
-            
-            LoaderType = Enum.TryParse(config["Pipeline:Loader"], ignoreCase: true, out LoaderType loaderType)
-                ? loaderType
-                : LoaderType.Sqlite,
-            
-            FuserType = Enum.TryParse(config["Pipeline:Fuser"], ignoreCase: true, out FuserType fuserType)
-                ? fuserType
-                : FuserType.LastObservationCarriedForward,
-            
-            WriterType = Enum.TryParse(config["Pipeline:Writer"], ignoreCase: true, out WriterType writerType)
-                ? writerType
-                : WriterType.None
-        };
+        var appSettings = new AppSettings(config);
 
-        var simulationConfig = new RunSimulationConfig
-        {
-            InitialCash = config.GetValue("Simulation:InitialCash", 100000m),
-
-            ComissionModel = Enum.TryParse(config["Simulation:ComissionModel"], ignoreCase: true, out ComissionModelType comissionModel)
-                ? comissionModel
-                : ComissionModelType.Default,
-
-            SlippageModel = Enum.TryParse(config["Simulation:SlippageModel"], ignoreCase: true, out SlippageModelType slippageModel)
-                ? slippageModel
-                : SlippageModelType.Default,
-                
-            IncludeMarketFrame = config.GetValue("Output:IncludeMarketFrame", false),
-
-            IncludeTradeLog = config.GetValue("Output:IncludeTradeLog", true),
-            
-            IncludeEquityCurve = config.GetValue("Output:IncludeEquityCurve", true)
-            
-        };
-
-
-
-        builder.Services.AddSingleton(pipelineConfig);
-        builder.Services.AddSingleton(simulationConfig);
-
+        builder.Services.AddSingleton(appSettings);
+       
         builder.Logging.ClearProviders();
         builder.Logging.AddConsole(options => options.FormatterName = "custom");
 
@@ -82,13 +34,12 @@ internal class Program
         var logger = app.Services.GetRequiredService<ILogger<Program>>();
         var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
 
-        var resolvedPipelineConfig = app.Services.GetRequiredService<RunPipelineConfig>();
-        var resolvedSimulationConfig = app.Services.GetRequiredService<RunSimulationConfig>();
+        var resolvedAppSettings = app.Services.GetRequiredService<AppSettings>();
 
-        var rootCommand = new RootCommand("REU Data Processing Application")
+        var rootCommand = new RootCommand("REU - Research and Execution Utility")
         {
-            new RunPipelineCommand(resolvedPipelineConfig, loggerFactory),
-            new RunSimulationCommand(resolvedSimulationConfig, resolvedPipelineConfig, loggerFactory)
+            new RunPipelineCommand(resolvedAppSettings, loggerFactory),
+            new RunSimulationCommand(resolvedAppSettings, loggerFactory)
         };
 
         return await rootCommand.Parse(args).InvokeAsync();

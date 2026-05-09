@@ -1,16 +1,16 @@
+using Microsoft.Extensions.Logging;
 using System.CommandLine;
 using App.Options;
 using App.Runners;
 using Contracts.Configs;
 using Contracts.Definitions;
 using Contracts.Enums;
-using Microsoft.Extensions.Logging;
-using App;
+using Contracts.Models;
 namespace App.Commands;
 
 public class RunPipelineCommand : Command
 {
-    public RunPipelineCommand(RunPipelineConfig config, ILoggerFactory loggerFactory) : base("pipeline", "Run the data processing pipeline with the specified configuration.")
+    public RunPipelineCommand(AppSettings appSettings, ILoggerFactory loggerFactory) : base("pipeline", "Run the data processing pipeline with the specified configuration.")
     {
 
         var opts = new PipelineCommandOptions();
@@ -20,21 +20,25 @@ public class RunPipelineCommand : Command
 
         SetAction(async (context) =>
         {
-            var instruments = context.GetValue(opts.Instruments);
-            var timeframe = context.GetValue(opts.Timeframe);
-            var startDate = context.GetValue(opts.StartDate);
-            var endDate = context.GetValue(opts.EndDate);
-            var factors = context.GetValue(opts.Factors);
+            var instruments      = context.GetValue(opts.Instruments);
+            var timeframe        = context.GetValue(opts.Timeframe);
+            var startDate        = context.GetValue(opts.StartDate);
+            var endDate          = context.GetValue(opts.EndDate);
+            var factors          = context.GetValue(opts.Factors);
 
-            var connectionString = config.ConnectionString;
-            var filePath = config.FilePath;
-            var outputPath = config.OutputPath;
+            var connectionString = appSettings.ConnectionString;
+            var filePath         = appSettings.SourceFilePath;
+            var outputPath       = appSettings.OutputRoot;
 
-            var loader = config.LoaderType;
-            var fuser = config.FuserType;
-            var writer = config.WriterType;
+            var loader           = appSettings.LoaderType;
+            var fuser            = appSettings.FuserType;
+            var writer           = appSettings.WriterType;
 
-            // note: introduce separate validation layer
+            var includeOhlcvFrames  = appSettings.IncludeOhlcvFrames;
+            var includeTradeLog     = appSettings.IncludeTradeLog;
+            var includeEquityCurve  = appSettings.IncludeEquityCurve;
+
+
             if (instruments == null || instruments.Length == 0)
                 throw new ArgumentException("At least one instrument must be specified using --instrument or -i option.");
 
@@ -49,19 +53,19 @@ public class RunPipelineCommand : Command
                 Dataset = new DatasetDefinition
                 {
                     Instruments = instruments,
-                    Timeframe = timeframe.Value,
-                    StartDate = startDate ?? DateTime.MinValue,  
-                    EndDate = endDate ?? DateTime.MaxValue,
-                    Factors = factors ?? Array.Empty<FactorDefinition>()
+                    Timeframe   = timeframe.Value,
+                    StartDate   = startDate ?? DateTime.MinValue,  
+                    EndDate     = endDate ?? DateTime.MaxValue,
+                    Factors     = factors ?? []
                 },
-                IncludeEquityCurve = false,
-                IncludeMarketFrame = true,
-                IncludeTradeLog = false,
-                Source = loader == LoaderType.Sqlite ? connectionString : filePath,
-                OutputPath = outputPath,
-                LoaderType = loader,
-                FuserType = fuser,
-                WriterType = writer
+                IncludeEquityCurve = includeEquityCurve,
+                IncludeOhlcvFrames = includeOhlcvFrames,
+                IncludeTradeLog    = includeTradeLog,
+                Source             = loader == LoaderType.Sqlite ? connectionString : filePath,
+                OutputPath         = outputPath,
+                LoaderType         = loader,
+                FuserType          = fuser,
+                WriterType         = writer
             };
 
             var runConfig = new RunConfig

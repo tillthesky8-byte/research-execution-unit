@@ -5,12 +5,13 @@ using Contracts.Definitions;
 using Contracts.Enums;
 using Microsoft.Extensions.Logging;
 using App.Runners;
+using Contracts.Models;
 namespace App.Commands;
 
 public class RunSimulationCommand : Command
 {
     private readonly ILogger<RunSimulationCommand> _logger;
-    public RunSimulationCommand(RunSimulationConfig simulationConfig, RunPipelineConfig pipelineConfig, ILoggerFactory loggerFactory) : base("simulation", "Run a backtest simulation with the specified configuration")
+    public RunSimulationCommand(AppSettings appSettings, ILoggerFactory loggerFactory) : base("simulation", "Run a backtest simulation with the specified configuration")
     {
         _logger = loggerFactory.CreateLogger<RunSimulationCommand>();
         var opts = new SimulationCommandOptions();
@@ -20,32 +21,46 @@ public class RunSimulationCommand : Command
 
         SetAction(async (context) =>
         {
-            var connectionString = pipelineConfig.ConnectionString;
-            var filePath = pipelineConfig.FilePath;
-            var outputPath = pipelineConfig.OutputPath;
+            //==============================================================================
+            // FOUNDATIONAL SETTINGS
+            //==============================================================================
+            var connectionString   = appSettings.ConnectionString;
+            var filePath           = appSettings.SourceFilePath;
+            var outputPath         = appSettings.OutputRoot;
+            var configPath         = appSettings.ConfigurationRoot;
 
-            var loader = pipelineConfig.LoaderType;
-            var fuser = pipelineConfig.FuserType;
-            var writer = pipelineConfig.WriterType;
+            var loader             = appSettings.LoaderType;
+            var fuser              = appSettings.FuserType;
+            var writer             = appSettings.WriterType;
            
 
-            var initialCash = simulationConfig.InitialCash; 
-            var slippageModel = simulationConfig.SlippageModel; 
-            var comissionModel = simulationConfig.ComissionModel; 
+            var initialCash        = appSettings.InitialCash; 
+            var slippageModel      = appSettings.SlippageModelType; 
+            var comissionModel     = appSettings.ComissionModelType; 
 
-            var includeMarketFrame = simulationConfig.IncludeMarketFrame;
-            var includeTradeLog = simulationConfig.IncludeTradeLog;
-            var includeEquityCurve = simulationConfig.IncludeEquityCurve;
-            var configPath = pipelineConfig.ConfigPath;
+            var IncludeOhlcvFrames = appSettings.IncludeOhlcvFrames;
+            var includeTradeLog    = appSettings.IncludeTradeLog;
+            var includeEquityCurve = appSettings.IncludeEquityCurve;
 
-            var yamlConfigName = context.GetValue(opts.YamlConfig);
 
-            var yamlOptions = new YamlSimulationOptions();
+
+            //==============================================================================
+            // YAML CONFIGURATION LOADING
+            //==============================================================================
+
+            var yamlConfigName     = context.GetValue(opts.YamlConfig);
+
+            var yamlOptions        = new YamlSimulationOptions();
 
             if (!string.IsNullOrEmpty(yamlConfigName))
-                yamlOptions.LoadFromYaml(pipelineConfig.ConfigPath, yamlConfigName);
+                yamlOptions.LoadFromYaml(appSettings.ConfigurationRoot, yamlConfigName);
+
             
+            //==============================================================================
+            // PARSE COMMAND-LINE OVERRIDES
+            //==============================================================================
             var cliInstruments = context.GetValue(opts.Instruments);
+
             var instruments = (((cliInstruments != null && cliInstruments.Length > 0) ? cliInstruments : yamlOptions.Instruments)
                 ?? throw new ArgumentException("At least one instrument must be specified using --instrument or -i option, or in the YAML configuration file."))
                 .Cast<InstrumentDefinition>()
@@ -74,6 +89,11 @@ public class RunSimulationCommand : Command
             var cliStrategy = context.GetValue(opts.Strategy);
             var strategy = cliStrategy ?? yamlOptions.StrategyDefinition ?? throw new ArgumentException("A strategy must be specified using --strategy or -s option, or in the YAML configuration file.");
 
+
+
+            //==============================================================================
+            // BUILD CONFIG OBJECTS
+            //==============================================================================
             var pipelineDefinition = new PipelineDefinition
             {
                 Dataset = new DatasetDefinition
@@ -86,7 +106,7 @@ public class RunSimulationCommand : Command
                 },
                 Source             = loader == LoaderType.Sqlite ? connectionString : filePath,
                 OutputPath         = outputPath,
-                IncludeMarketFrame = includeMarketFrame,
+                IncludeOhlcvFrames = IncludeOhlcvFrames,
                 IncludeTradeLog    = includeTradeLog,
                 IncludeEquityCurve = includeEquityCurve,
                 LoaderType         = loader,
@@ -103,9 +123,9 @@ public class RunSimulationCommand : Command
 
             var outputDefinition = new OutputDefinition
             {
-                OutputPath = outputPath,
-                IncludeOhlcvFrames = includeMarketFrame,
-                IncludeTradeLog = includeTradeLog,
+                OutputPath         = outputPath,
+                IncludeOhlcvFrames = IncludeOhlcvFrames,
+                IncludeTradeLog    = includeTradeLog,
                 IncludeEquityCurve = includeEquityCurve,
             };
             _logger.LogDebug("OutputDefinition: OutputPath: {OutputPath}, IncludeOhlcvFrames: {IncludeOhlcvFrames}, IncludeTradeLog: {IncludeTradeLog}, IncludeEquityCurve: {IncludeEquityCurve}", outputDefinition.OutputPath, outputDefinition.IncludeOhlcvFrames, outputDefinition.IncludeTradeLog, outputDefinition.IncludeEquityCurve);
@@ -117,6 +137,11 @@ public class RunSimulationCommand : Command
                 OutputDefinition    = outputDefinition
             };
 
+
+
+            //==============================================================================
+            // RUN SIMULATION
+            //==============================================================================
 
             var simulationRunner = new SimulationRunner(runConfig, loggerFactory);
 
