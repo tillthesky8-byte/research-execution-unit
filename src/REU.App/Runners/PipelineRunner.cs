@@ -16,7 +16,7 @@ public sealed class PipelineRunner
     {
         _loggerFactory = loggerFactory;
         _pipelineDefinition = runConfig.PipelineDefinition ?? throw new ArgumentException("PipelineDefinition must be provided in RunConfig.");
-        _runId = runConfig.RunId;
+        _runId = runConfig.RunId!;
 
     }
     public async Task RunAsync()

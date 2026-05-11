@@ -1,0 +1,15 @@
+name: default
+
+instruments: 
+  - EURUSD
+
+timeframe: m5
+
+factors:
+  - us_interest_rate
+
+strategy:
+  type: FxRateRegime
+  parameters:
+    upperThreshold: 3
+    lowerThreshold: 2
