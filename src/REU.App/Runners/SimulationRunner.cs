@@ -16,7 +16,7 @@ public sealed class SimulationRunner
     private readonly PipelineDefinition  _pipelineDefinition;
     private readonly SimulatorDefinition _simulatorDefinition;
     private readonly OutputDefinition    _outputDefinition;
-    private readonly ILogger<SimulationRunner> _logger;
+    private readonly ILogger<SimulationRunner>? _logger;
 
     public SimulationRunner(RunConfig runConfig, ILoggerFactory loggerFactory)
     {
@@ -25,8 +25,8 @@ public sealed class SimulationRunner
         _pipelineDefinition  = runConfig.PipelineDefinition  ?? throw new ArgumentException("PipelineDefinition must be provided in RunConfig.");
         _simulatorDefinition = runConfig.SimulatorDefinition ?? throw new ArgumentException("SimulatorDefinition must be provided in RunConfig.");
         _outputDefinition    = runConfig.OutputDefinition    ?? throw new ArgumentException("OutputDefinition must be provided in RunConfig.");
-        _runId = runConfig.RunId;
-        _logger = loggerFactory.CreateLogger<SimulationRunner>();
+        _runId               = runConfig.RunId               ?? throw new ArgumentException("RunId must be provided in RunConfig.");
+        _logger              = loggerFactory.CreateLogger<SimulationRunner>();
     }
 
     public async Task Run()

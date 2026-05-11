@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Contracts.Interfaces;
 using Contracts.Models;
+using Contracts;
 using Microsoft.Extensions.Logging;
 namespace Writer.Output;
         
@@ -32,7 +33,7 @@ public sealed class Manager : IManager
 
         File.WriteAllText(filePath, json);
 
-        _logger.LogDebug("Saved series {SeriesName} to {FilePath}", seriesName, filePath);
+        _logger.LogDebug("{background}{foreground}{FilePath}{reset} Saved series {SeriesName}", ConsoleColors.PathBackgroundColor, ConsoleColors.PathForegroundColor, filePath, ConsoleColors.Reset, seriesName);
 
     }
 
@@ -45,7 +46,7 @@ public sealed class Manager : IManager
 
         File.WriteAllText(filePath, json);
 
-        _logger.LogDebug("Saved object {ObjectName} to {FilePath}", objectName, filePath);
+        _logger.LogDebug("{background}{foreground}{FilePath}{reset} Saved object {ObjectName}", ConsoleColors.PathBackgroundColor, ConsoleColors.PathForegroundColor, filePath, ConsoleColors.Reset, objectName);
     }
 
 
@@ -55,7 +56,7 @@ public sealed class Manager : IManager
         if (!Directory.Exists(directoryPath))
         {
             Directory.CreateDirectory(directoryPath);
-            _logger.LogDebug("Created output directory at {DirectoryPath}", directoryPath);
+            _logger.LogDebug("{background}{foreground}{DirectoryPath}{reset} Created output directory", ConsoleColors.PathBackgroundColor, ConsoleColors.PathForegroundColor, directoryPath, ConsoleColors.Reset);
         }
     }
 }

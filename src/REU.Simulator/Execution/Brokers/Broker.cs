@@ -9,16 +9,16 @@ namespace Simulator.Execution.Brokers;
 
 public class Broker : IBroker
 {
-    private readonly ILogger<Broker> _logger;
-    private readonly IComissionModel _comissionModel;
-    private readonly ISlippageModel _slippageModel;
-    private readonly List<Order> _pendingOrders = new();
+    private readonly ILogger<Broker>? _logger;
+    private readonly IComissionModel  _comissionModel;
+    private readonly ISlippageModel   _slippageModel;
+    private readonly List<Order>      _pendingOrders = new();
 
-    public Broker(ILogger<Broker> logger, IComissionModel comissionModel, ISlippageModel slippageModel)
+    public Broker(ILogger<Broker>? logger, IComissionModel comissionModel, ISlippageModel slippageModel)
     {
-        _logger = logger;
+        _logger         = logger;
         _comissionModel = comissionModel;
-        _slippageModel = slippageModel;
+        _slippageModel  = slippageModel;
     }
 
     public void SubmitOrder(OrderRequest orderRequest, MarketRow MarketRow, Portfolio portfolio)
@@ -29,11 +29,11 @@ public class Broker : IBroker
             Request = orderRequest
         };
         _pendingOrders.Add(order);
-        _logger.LogTrace(LogMessages.OrderSubmitted(order.Id, orderRequest.Symbol, orderRequest.Quantity, orderRequest.Type, orderRequest.Side));
+        _logger?.LogTrace(LogMessages.OrderSubmitted(order.Id, orderRequest.Symbol, orderRequest.Quantity, orderRequest.Type, orderRequest.Side));
     }
     public void ProcessOrders(MarketRow MarketRow, Portfolio portfolio)
     {
-        _logger.LogTrace(LogMessages.OnNewTickPendingOrders(_pendingOrders.Count));
+        _logger?.LogTrace(LogMessages.OnNewTickPendingOrders(_pendingOrders.Count));
         var toRemove = new List<Order>();
         foreach (var pending in _pendingOrders)
         {
@@ -64,35 +64,37 @@ public class Broker : IBroker
 
         decimal rawPrice = order.Request.Type switch
         {
-            OrderType.Market => symbolBar.Close,
-            OrderType.Limit => order.Request.LimitPrice!.Value,
-            OrderType.Stop => symbolBar.Close,
-            _ => throw new ArgumentOutOfRangeException()
+            OrderType.Market => symbolBar.Close                    ,
+            OrderType.Limit  => order    .Request.LimitPrice!.Value,
+            OrderType.Stop   => symbolBar.Close                    ,
+            
+            _                => throw new ArgumentOutOfRangeException()
         };
 
-        decimal fillPrice = _slippageModel.Apply(rawPrice, order.Request, MarketRow);
+        decimal fillPrice = _slippageModel .Apply              (rawPrice , order.Request         , MarketRow);
         decimal comission = _comissionModel.CalculateCommission(fillPrice, order.Request.Quantity);
 
-        decimal totalCost = fillPrice * order.Request.Quantity + (order.Request.Side == OrderSide.Buy ? comission : -comission);
+        decimal totalCost = fillPrice * order.Request.Quantity + 
+            (order.Request.Side == OrderSide.Buy ? comission : -comission);
 
         if (order.Request.Side == OrderSide.Buy)
         {
             if (portfolio.Cash < totalCost)
             {
-                _logger.LogTrace(LogMessages.NotEnoughCash(order.Id, order.Request.Symbol, totalCost, portfolio.Cash));
+                _logger?.LogTrace(LogMessages.NotEnoughCash(order.Id, order.Request.Symbol, totalCost, portfolio.Cash));
                 return;
             }
-
             portfolio.AdjustPosition(order.Request.Symbol, order.Request.Quantity, fillPrice, MarketRow.Timestamp);
             portfolio.UpdateCash(-totalCost);
-            _logger.LogTrace(LogMessages.BuyOrderExecuted(order.Id, order.Request.Symbol, order.Request.Quantity, fillPrice, comission, totalCost));
+
+            _logger?.LogTrace(LogMessages.BuyOrderExecuted(order.Id, order.Request.Symbol, order.Request.Quantity, fillPrice, comission, totalCost));
         }
         else
         {
             // margin account will be implemented later, for now we allow short selling without borrowing constraints
             portfolio.AdjustPosition(order.Request.Symbol, -order.Request.Quantity, fillPrice, MarketRow.Timestamp);
             portfolio.UpdateCash(totalCost);
-           _logger.LogTrace(LogMessages.SellOrderExecuted(order.Id, order.Request.Symbol, order.Request.Quantity, fillPrice, comission, totalCost));
+           _logger?.LogTrace(LogMessages.SellOrderExecuted(order.Id, order.Request.Symbol, order.Request.Quantity, fillPrice, comission, totalCost));
         }
 
 

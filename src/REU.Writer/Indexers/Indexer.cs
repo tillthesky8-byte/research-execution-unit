@@ -45,9 +45,10 @@ public sealed class Indexer : IIndexer
             _logger?.LogDebug($"Config file not found at {configPath}, skipping entry creation for {runDir}");
             return null;
         }
-        var configJson = File.ReadAllText(configPath);
-        var runConfig = JsonSerializer.Deserialize<RunConfig>(configJson, _jsonOptions);
-        var entry = new IndexEntry
+        
+        var configJson = File.ReadAllText(configPath);        
+        var runConfig  = JsonSerializer.Deserialize<RunConfig>(configJson, _jsonOptions);
+        var entry      = new IndexEntry
         (
             RunDate:      runConfig?.RunDate ?? DateTime.MinValue,
             RunId:        runConfig?.RunId ?? "unknown",

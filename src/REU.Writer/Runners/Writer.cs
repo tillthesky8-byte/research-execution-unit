@@ -39,9 +39,6 @@ public sealed class Writer
 
         if (_includeOhlcvFrames && outputBundle.MarketData is not null)
                 WriteFrames(outputBundle.MarketData);
-        else     
-                _logger.LogDebug("IncludeOhlcvFrames: {IncludeOhlcvFrames}", _includeOhlcvFrames);
-                _logger.LogDebug("Skipping OHLCV frame output as MarketData is null");
 
         if (_includeTradeLog && outputBundle.SimulationResult?.Trades is not null)
                 WriteTradeLog(outputBundle.SimulationResult.Trades);
@@ -65,12 +62,18 @@ public sealed class Writer
 
     private void WriteTradeLog(IReadOnlyList<Trade> trades)
     {
-        _outputManager.SaveSeries(trades, "trade_log");
+        var tradeRecords = trades.Select(t => new TradeRecord(t)).ToList();
+        _outputManager.SaveSeries(tradeRecords, "trade_log");
+        _logger.LogDebug("Written {Count} trade records to trade_log", tradeRecords.Count);
     }
 
     private void WriteEquityCurve(IReadOnlyList<EquityPoint> equityCurve)
     {
-        _outputManager.SaveSeries(equityCurve, "equity_curve");
+        _logger.LogDebug("Timestamp duplicates in EQUITY POINTS: {Count}", equityCurve.GroupBy(p => p.Timestamp).Where(g => g.Count() > 1).Count());
+        var equityRecords = equityCurve.Select(e => new EquityRecord(e)).ToList();
+        _outputManager.SaveSeries(equityRecords, "equity_curve");
+        _logger.LogDebug("Written {Count} equity records to equity_curve", equityRecords.Count);
+        _logger.LogDebug("Timestamp duplicates in EQUITY RECORDS: {Count}", equityRecords.GroupBy(r => r.Time).Where(g => g.Count() > 1).Count());
     }
 
     private void WriteRunConfig(RunConfig runConfig)

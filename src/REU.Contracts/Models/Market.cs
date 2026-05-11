@@ -21,12 +21,11 @@ public class Market(IReadOnlyList<MarketRow> rows)
                 }
                 ohlcvList.Add(new OhlcvCandle
                 {
-                    Timestamp = ToUnixTimestamp(marketRow.Timestamp),
+                    Time = ToUnixTimestamp(marketRow.Timestamp),
                     Open = ohlcvBar.Open,
                     High = ohlcvBar.High,
                     Low = ohlcvBar.Low,
-                    Close = ohlcvBar.Close,
-                    Volume = ohlcvBar.Volume
+                    Close = ohlcvBar.Close
                 });
             }
         }

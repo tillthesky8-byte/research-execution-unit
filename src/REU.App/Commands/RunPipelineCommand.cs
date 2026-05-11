@@ -73,6 +73,9 @@ public class RunPipelineCommand : Command
                 PipelineDefinition = pipelineDefinition
             };
 
+            runConfig.SetRunId();
+            runConfig.SetRunDate();
+
             var pipelineRunner = new PipelineRunner(runConfig, loggerFactory);
 
             await pipelineRunner.RunAsync();

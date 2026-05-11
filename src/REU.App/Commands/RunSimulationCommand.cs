@@ -137,7 +137,8 @@ public class RunSimulationCommand : Command
                 OutputDefinition    = outputDefinition
             };
 
-
+            runConfig.SetRunId();
+            runConfig.SetRunDate();
 
             //==============================================================================
             // RUN SIMULATION

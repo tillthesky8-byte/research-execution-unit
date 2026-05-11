@@ -10,7 +10,7 @@ strategy:
 
   parameters:
     MiddlePeriod: 21
-    sideperiod: 951
+    SidePeriod: 900
     stdm: 2
     source: "close"
 

@@ -29,7 +29,7 @@ public class SimulatorBuilder
 
         var broker = BrokerFactory.CreateBroker(_simulatorDefinition.SlippageModel, _simulatorDefinition.ComissionModel, _loggerFactory);
 
-        var portfolio = PortfolioFactory.CreatePortfolio(_simulatorDefinition.InitialCash);
+        var portfolio = PortfolioFactory.CreatePortfolio(_simulatorDefinition.InitialCash, _loggerFactory.CreateLogger<Portfolio>());
 
         var recorder = new Recorder();
 

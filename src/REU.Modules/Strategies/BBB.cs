@@ -52,6 +52,9 @@ public class BBB(ILogger<BBB> logger) : IStrategy
             var hasPosition = portfolio.Positions.TryGetValue(symbol, out var position);
             var allocation = portfolio.Cash * 1m; 
             var quantity = Math.Floor(allocation / bar.Close);
+            if (quantity == 0) continue;
+
+             
 
             if (!hasPosition || position!.Quantity == 0) 
             {
